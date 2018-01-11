@@ -34,6 +34,7 @@ make_library(unity_core
     unity_sarray_binary_operations.cpp
     unity_sarray.cpp
     unity_sframe.cpp
+    unity_timeseries.cpp
     flex_dict_view.cpp
     unity_sgraph.cpp
     unity_sketch.cpp
@@ -50,12 +51,12 @@ make_library(unity_core
     ${VISUALIZATION_SOURCES}
   REQUIRES
     flexible_type
-    pylambda 
+    pylambda
     table_printer
-    sframe cancel_serverside_ops 
-    sframe_query_engine 
-    libjson sgraph 
-    curl 
+    sframe cancel_serverside_ops
+    sframe_query_engine
+    libjson sgraph
+    curl
     image_type image_io
     startup_teardown
     pylambda_worker
@@ -70,4 +71,3 @@ make_library(unity_core
 make_shared_library_from_static(unity_core_shared
                                 REQUIRES
                                 unity_core)
-

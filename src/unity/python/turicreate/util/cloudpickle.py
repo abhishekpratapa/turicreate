@@ -930,6 +930,7 @@ class CloudPickler(Pickler):
             return
         ## Make sure the unity objects are not picklable ##
         self.dispatch[tc.SArray] = self.__class__.save_unsupported
+        self.dispatch[tc.TimeSeries] = self.__class__.save_unsupported
         self.dispatch[tc.SFrame] = self.__class__.save_unsupported
         self.dispatch[tc.SGraph] = self.__class__.save_unsupported
         self.dispatch[tc.Sketch] = self.__class__.save_unsupported
@@ -937,6 +938,7 @@ class CloudPickler(Pickler):
 
         ## Make sure the underlying cython objects are not picklable ##
         self.dispatch[tc.cython.cy_sarray.UnitySArrayProxy] = self.__class__.save_unsupported
+        self.dispatch[tc.cython.cy_timeseries.UnityTimeSeriesProxy] = self.__class__.save_unsupported
         self.dispatch[tc.cython.cy_sframe.UnitySFrameProxy] = self.__class__.save_unsupported
         self.dispatch[tc.cython.cy_sketch.UnitySketchProxy] = self.__class__.save_unsupported
         self.dispatch[tc.cython.cy_graph.UnityGraphProxy] = self.__class__.save_unsupported

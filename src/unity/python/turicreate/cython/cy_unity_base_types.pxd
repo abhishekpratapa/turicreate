@@ -19,6 +19,10 @@ cdef extern from "<unity/lib/api/unity_sframe_interface.hpp>" namespace "turi":
     cdef cppclass unity_sframe_base:
         pass
 
+cdef extern from "<unity/lib/api/unity_timeseries_interface.hpp>" namespace "turi":
+    cdef cppclass unity_timeseries_base:
+        pass
+
 cdef extern from "<unity/lib/api/unity_sarray_interface.hpp>" namespace "turi":
     cdef cppclass unity_sarray_base:
         pass
@@ -48,10 +52,11 @@ cdef extern from "<unity/lib/api/unity_sframe_builder_interface.hpp>" namespace 
         pass
 
 ctypedef shared_ptr[unity_sarray_base] unity_sarray_base_ptr
+ctypedef shared_ptr[unity_timeseries_base] unity_timeseries_base_ptr
 ctypedef shared_ptr[unity_sframe_base] unity_sframe_base_ptr
 ctypedef shared_ptr[unity_sgraph_base] unity_sgraph_base_ptr
 ctypedef shared_ptr[unity_sketch_base] unity_sketch_base_ptr
 ctypedef shared_ptr[model_base] model_base_ptr
-ctypedef shared_ptr[unity_global_base] unity_global_base_ptr 
+ctypedef shared_ptr[unity_global_base] unity_global_base_ptr
 ctypedef shared_ptr[unity_sarray_builder_base] unity_sarray_builder_base_ptr
 ctypedef shared_ptr[unity_sframe_builder_base] unity_sframe_builder_base_ptr

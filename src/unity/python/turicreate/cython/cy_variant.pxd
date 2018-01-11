@@ -24,6 +24,7 @@ cdef extern from "<unity/lib/api/client_base_types.hpp>" namespace "turi":
         variant_type& set_model "operator=<std::shared_ptr<turi::model_base>>"(const model_base_ptr& other)
         variant_type& set_sframe "operator=<std::shared_ptr<turi::unity_sframe_base>>"(const unity_sframe_base_ptr& other)
         variant_type& set_sarray "operator=<std::shared_ptr<turi::unity_sarray_base>>"(const unity_sarray_base_ptr& other)
+        variant_type& set_timeseries "operator=<std::shared_ptr<turi::unity_timeseries_base>>"(const unity_timeseries_base_ptr& other)
 
 
     flexible_type& variant_get_flexible_type "turi::variant_get_ref<turi::flexible_type>" (variant_type& v)
@@ -51,6 +52,7 @@ cdef extern from "<unity/lib/api/client_base_types.hpp>" namespace "turi":
     void variant_set_model "turi::variant_set_value<std::shared_ptr<turi::model_base>>" (variant_type& v, model_base_ptr& f)
     void variant_set_sframe "turi::variant_set_value<std::shared_ptr<turi::unity_sframe_base>>" (variant_type& v, unity_sframe_base_ptr& f)
     void variant_set_sarray "turi::variant_set_value<std::shared_ptr<turi::unity_sarray_base>>" (variant_type& v, unity_sarray_base_ptr& f)
+    void variant_set_timeseries "turi::variant_set_value<std::shared_ptr<turi::unity_timeseries_base>>" (variant_type& v, unity_timeseries_base_ptr& f)
     void variant_set_variant_map "turi::variant_set_value<turi::variant_map_type>" (variant_type& v, const map[string, variant_type]& f)
     void variant_set_variant_vector "turi::variant_set_value<turi::variant_vector_type>" (variant_type& v, const vector[variant_type]& f)
 
