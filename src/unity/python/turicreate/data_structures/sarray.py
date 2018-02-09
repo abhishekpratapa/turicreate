@@ -2891,12 +2891,21 @@ class SArray(object):
         >>> sa.show(title="My Plot Title", xlabel="My X Axis", ylabel="My Y Axis")
         """
         import sys
-        if sys.platform != 'darwin':
+        import os
+
+        if sys.platform != 'darwin' and sys.platform != 'linux2':
             raise NotImplementedError('Visualization is currently supported only on macOS.')
 
-        import os
+        path_to_client = ""
+
         (tcviz_dir, _) = os.path.split(os.path.dirname(__file__))
-        path_to_client = os.path.join(tcviz_dir, 'Turi Create Visualization.app', 'Contents', 'MacOS', 'Turi Create Visualization')
+
+        if sys.platform == 'darwin':
+            path_to_client = os.path.join(tcviz_dir, 'Turi Create Visualization.app', 'Contents', 'MacOS', 'Turi Create Visualization')
+
+        # starts with linux    
+        if sys.platform == 'linux2':
+            path_to_client = os.path.join(tcviz_dir, 'Debug', 'turicreateviz')
 
         if title == "":
             title = " "

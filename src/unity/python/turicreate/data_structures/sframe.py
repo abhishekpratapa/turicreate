@@ -4444,12 +4444,23 @@ class SFrame(object):
         >>> sf.explore(title="My Plot Title")
         """
         import sys
-        if sys.platform != 'darwin':
+        import os
+
+        if sys.platform != 'darwin' and sys.platform != 'linux2':
             raise NotImplementedError('Visualization is currently supported only on macOS.')
 
-        import os
+        path_to_client = ""
+
         (tcviz_dir, _) = os.path.split(os.path.dirname(__file__))
-        path_to_client = os.path.join(tcviz_dir, 'Turi Create Visualization.app', 'Contents', 'MacOS', 'Turi Create Visualization')
+
+        if sys.platform == 'darwin':
+            path_to_client = os.path.join(tcviz_dir, 'Turi Create Visualization.app', 'Contents', 'MacOS', 'Turi Create Visualization')
+
+        # starts with linux
+        if sys.platform == 'linux2':
+            path_to_client = os.path.join(tcviz_dir, 'Debug', 'turicreateviz')
+
+
         if title is None:
             title = ""
         self.__proxy__.explore(path_to_client, title)
@@ -4469,12 +4480,22 @@ class SFrame(object):
         >>> sf.show()
         """
         import sys
-        if sys.platform != 'darwin':
+        import os
+
+        if sys.platform != 'darwin' and sys.platform != 'linux2':
             raise NotImplementedError('Visualization is currently supported only on macOS.')
 
-        import os
+        path_to_client = ""
+
         (tcviz_dir, _) = os.path.split(os.path.dirname(__file__))
-        path_to_client = os.path.join(tcviz_dir, 'Turi Create Visualization.app', 'Contents', 'MacOS', 'Turi Create Visualization')
+
+        if sys.platform == 'darwin':
+            path_to_client = os.path.join(tcviz_dir, 'Turi Create Visualization.app', 'Contents', 'MacOS', 'Turi Create Visualization')
+
+        # starts with linux
+        if sys.platform == 'linux2':
+            path_to_client = os.path.join(tcviz_dir, 'Debug', 'turicreateviz')
+            
         self.__proxy__.show(path_to_client)
 
     def pack_columns(self, column_names=None, column_name_prefix=None, dtype=list,

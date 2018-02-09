@@ -15,6 +15,7 @@
 #include <string>
 
 #include <errno.h>
+#include <unistd.h>
 
 using namespace turi::visualization;
 
@@ -25,9 +26,11 @@ process_wrapper::process_wrapper(const std::string& path_to_client) : m_alive(tr
                   std::vector<std::string>(),
                   STDOUT_FILENO,
                   true /* open_write_pipe */);
+
   if (!m_client_process.exists()) {
     throw std::runtime_error("Turi Create visualization process was unable to launch.");
   }
+
   m_client_process.set_nonblocking(true);
   m_client_process.autoreap();
 
@@ -41,7 +44,6 @@ process_wrapper::process_wrapper(const std::string& path_to_client) : m_alive(tr
         continue;
       }
 
-      // split on newline - each message is newline separated
       std::stringstream ss;
       for (char c : input) {
         if (c == '\n') {
@@ -78,15 +80,18 @@ process_wrapper::process_wrapper(const std::string& path_to_client) : m_alive(tr
 
   // workaround to pop-under GUI app window from popen:
   // https://stackoverflow.com/a/13553471
-  ::turi::process osascript;
-  osascript.popen("/usr/bin/osascript",
-      std::vector<std::string>({
-        "-e",
-        "delay .5",
-        "-e",
-        "tell application \"Turi Create Visualization\" to activate"
-      }),
-      0, false);
+
+  #ifdef __APPLE__
+    ::turi::process osascript;
+    osascript.popen("/usr/bin/osascript",
+        std::vector<std::string>({
+          "-e",
+          "delay .5",
+          "-e",
+          "tell application \"Turi Create Visualization\" to activate"
+        }),
+        0, false);
+  #endif
 }
 
 process_wrapper::~process_wrapper() {
