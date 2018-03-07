@@ -19,23 +19,23 @@ function print_help {
   echo "  --cleanup                         Clean up everything."
   echo
   echo "  --install-python-toolchain        Install python in local virtualenv."
-  echo  
+  echo
   echo "  --with-system-cmake (default)     Use system cmake, if avaliable."
   echo "  --no-system-cmake "
-  echo 
+  echo
   echo "  --with-ccache (default)           Use ccache, if available."
   echo "  --no-ccache "
-  echo  
+  echo
   echo "  --with-python (default)           Build python components."
   echo "  --no-python"
-  echo 
+  echo
   echo "  --with-visualization (default)    Build Turi Create visualization client."
   echo "  --no-visualization"
   echo
   echo "  --python2.7                       Use Python 2.7 (default)."
   echo "  --python3.5                       Use Python 3.5, default is Python 2.7."
   echo "  --python3.6                       Use Python 3.6, default is Python 2.7."
-  echo 
+  echo
   echo "  --yes                             Defaults to yes on a prompt"
   echo
   echo "  -D var=value                      Specify CFLAGS definitions to be passed on to cmake."
@@ -78,8 +78,8 @@ function run_cleanup_prompt {
   fi
 }
 
-function install_python_toolchain { 
-  
+function install_python_toolchain {
+
   echo "Installing python toolchain."
   echo "python version = $PYTHON_VERSION."
 
@@ -100,6 +100,7 @@ with_ccache=1
 
 with_ccache=1
 with_visualization=1
+with_annotation_tools=1
 
 python27=0
 python35=0
@@ -112,27 +113,30 @@ python36=0
 while [ $# -gt 0 ]
   do case $1 in
     --cleanup)              cleanup_option=1;;
-    
+
     --install-python-toolchain) python_only=1;;
-    
+
     --with-system-cmake)    with_system_cmake=1;;
     --no-system-cmake)      with_system_cmake=0;;
 
     --with-ccache)          with_ccache=1;;
     --no-ccache)            with_ccache=0;;
-    
+
     --with-python)          with_python=1;;
     --no-python)            with_python=0;;
 
     --with-visualization)   with_visualization=1;;
     --no-visualization)     with_visualization=0;;
 
+    --with-annotation-tools) with_annotation_tools=1;;
+    --no-annotation-tools)  with_annotation_tools=0;;
+
     --yes)                  default_yes=1;;
 
     --python2.7)            python27=1;;
     --python3.5)            python35=1;;
     --python3.6)            python36=1;;
-    
+
     --help)                 print_help ;;
 
     -D)                     CMAKE_CONFIG_FLAGS="${CMAKE_CONFIG_FLAGS} -D $2"; shift ;;
@@ -166,13 +170,18 @@ fi
 
 if [[ $python_only == 1 ]]; then
   install_python_toolchain
-  exit $?  
+  exit $?
 fi
 
 # If we need to build python, we also need to install the python toolchain
 if [[ $with_python == 1 ]]; then
-  if [[ $with_visualization == 0 ]]; then 
+  if [[ $with_visualization == 0 ]]; then
     echo "Visualization client libraries (--with-visualization) required for python build."
+    exit 1
+  fi
+
+  if [[ $with_annotation_tools == 0 ]]; then
+    echo "Annotation client libraries (--with-annotation-tools) required for python build."
     exit 1
   fi
 
@@ -187,6 +196,12 @@ if [[ $with_visualization == 1 ]]; then
   CMAKE_CONFIG_FLAGS="$CMAKE_CONFIG_FLAGS -DTC_BUILD_VISUALIZATION_CLIENT=1"
 else
   CMAKE_CONFIG_FLAGS="$CMAKE_CONFIG_FLAGS -DTC_BUILD_VISUALIZATION_CLIENT=0"
+fi
+
+if [[ $with_annotation_tools == 1 ]]; then
+  CMAKE_CONFIG_FLAGS="$CMAKE_CONFIG_FLAGS -DTC_BUILD_ANNOTATION_CLIENT=1"
+else
+  CMAKE_CONFIG_FLAGS="$CMAKE_CONFIG_FLAGS -DTC_BUILD_ANNOTATION_CLIENT=0"
 fi
 
 
@@ -215,7 +230,7 @@ fi
 # If not specified we assume gcc and g++ are the default c and c++
 # compilers
 if [[ -z $CC ]]; then
-  if [[ `which cc` ]]; then 
+  if [[ `which cc` ]]; then
     CC=cc
   elif [[ `which gcc` ]]; then
     CC=gcc
@@ -228,9 +243,9 @@ if [[ -z $CC ]]; then
 fi
 
 if [[ -z $CXX ]]; then
-  if [[ `which cxx` ]]; then 
+  if [[ `which cxx` ]]; then
     CXX=cxx
-  elif [[ `which c++` ]]; then 
+  elif [[ `which c++` ]]; then
     CXX=c++
   elif [[ `which g++` ]]; then
     CXX=g++
@@ -244,9 +259,9 @@ fi
 
 CCCMD=`which $CC || echo ""`
 CXXCMD=`which $CXX || echo ""`
-  
+
 echo "CC = $CCCMD"
-echo "CXX = $CXXCMD" 
+echo "CXX = $CXXCMD"
 
 echo "Attempting to use C compiler $CCCMD."
 echo "Attempting to use C++ compiler $CXXCMD."
@@ -260,7 +275,7 @@ mkdir -p $DEPS_PREFIX/bin
 rm -f $CCSCR
 rm -f $CXXSCR
 
-if [ $with_ccache -eq 1 ] && [ -f $CCACHE ]; then 
+if [ $with_ccache -eq 1 ] && [ -f $CCACHE ]; then
 
   echo "Using ccache from $CCACHE."
 
@@ -276,7 +291,7 @@ if [ $with_ccache -eq 1 ] && [ -f $CCACHE ]; then
   exit \$?
   " > $CXXSCR && chmod a+x $CXXSCR
 
-else 
+else
 
   echo "#!/bin/bash -e
   $CCCMD \$@
@@ -343,7 +358,7 @@ function install_cmake {
 
 CMAKE=`which cmake || echo ""`
 
-function check_cmake { 
+function check_cmake {
 
   if [[ -f $CMAKE ]] ; then
 
@@ -355,8 +370,8 @@ function check_cmake {
         install_cmake
         return $?
       fi
-    fi 
-    
+    fi
+
     if [[ -f ${PWD}/deps/local/bin/cmake ]]; then
       CMAKE=${PWD}/deps/local/bin/cmake
     fi
@@ -382,9 +397,9 @@ function check_cmake {
   fi
 }
 
-check_cmake || { 
-  echo "Error 1: Error reported installing CMake." 
-  exit 1 
+check_cmake || {
+  echo "Error 1: Error reported installing CMake."
+  exit 1
 }
 
 ########################################################

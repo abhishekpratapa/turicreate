@@ -55,6 +55,12 @@ if (APPLE)
     DEPENDS visualization_client
     COMMAND cp -a "${CMAKE_BINARY_DIR}/src/visualization/${CMAKE_BUILD_TYPE}/Turi Create Visualization.app" ${CMAKE_CURRENT_BINARY_DIR}
   )
+
+  add_custom_target(
+    annotation_client_app ALL
+    DEPENDS annotation_client
+    COMMAND cp -a "${CMAKE_BINARY_DIR}/src/annotation/${CMAKE_BUILD_TYPE}/Turi Create Object Detection Annotation.app" ${CMAKE_CURRENT_BINARY_DIR}
+  )
 elseif(LINUX)
   add_custom_target(
     visualization_client_app ALL

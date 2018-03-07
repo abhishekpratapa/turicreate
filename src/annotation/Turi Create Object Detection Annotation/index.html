@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Object Detection Annotation</title>
+    <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="index.css">
+    </head>
+    <body>
+        <div id="image_canvas_container">
+            <img src=""/>
+            <canvas id="canvas" width=820 height=600>
+            </canvas>
+        </div>
+        <div id="info_bar">
+            <div class="inline_text" id="stats_container">
+                <span id="image_index"> 1 </span> / <span id="size_index"> 5000 </span>
+            </div>
+            
+            <button onclick="window.getPrevious()">
+                previous
+            </button>
+            
+            <button onclick="window.getNext()">
+                next
+            </button>
+            
+            <div class="inline_text" id="add_label">
+                + Add Label
+            </div>
+        </div>
+        <div id="label_container">
+        </div>
+        <div id="footer_element">
+        </div>
+        
+        <div id="modal_background">
+        </div>
+        
+        <div id="add_label_container">
+            <div id="create_label_text">
+                Create a New Label
+            </div>
+            <div id="create_label_errors">
+            </div>
+            <input type="text" id="create_label_text_box" placeholder = "Label Name"/>
+            <div id="cancel_button">
+                Cancel
+            </div>
+            <div id="add_label_button">
+                Add Label
+            </div>
+        </div>
+        
+        <div id="error_hint">
+            All boxes must be labeled before proceeding
+        </div>
+        
+        <div id="loading_container">
+            <div id="loading_main">
+                <div class="preprocessing_data_key">
+                    Loading
+                </div>
+                <div id="loading_screen">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            if(window.navigator.platform == 'MacIntel'){
+                window.vegaResult = null;
+                // Override console methods to get errors redirected to client app
+                function log(level) {
+                    return function() {
+                        var args = Array.prototype.slice.call(arguments);
+                        var msgText = args.map(JSON.stringify).join(' ');
+                        var message = {
+                            status: 'log',
+                            level: level,
+                            message: msgText
+                        };
+                        window.webkit.messageHandlers["scriptHandler"].postMessage(message);
+                    }
+                }
+                console = {};
+                console.log = log("log");
+                console.debug = log("debug");
+                console.info = log("info");
+                console.warn = log("warn");
+                console.error = log("error");
+            }
+        </script>
+        <script src="index.js" defer></script>
+    </body>
+</html>

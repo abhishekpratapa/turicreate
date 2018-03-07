@@ -163,6 +163,21 @@ if __name__ == '__main__':
                      'Turi Create Visualization.app/Contents/PkgInfo',
                      'Turi Create Visualization.app/Contents/MacOS/Turi Create Visualization',
 
+                     # macOS annotations
+                     'Turi Create Object Detection Annotation.app/Contents/_CodeSignature/CodeResources',
+                     'Turi Create Object Detection Annotation.app/Contents/Frameworks/*.dylib',
+                     'Turi Create Object Detection Annotation.app/Contents/Info.plist',
+                     'Turi Create Object Detection Annotation.app/Contents/Resources/*.car',
+                     'Turi Create Object Detection Annotation.app/Contents/Resources/*.css',
+                     'Turi Create Object Detection Annotation.app/Contents/Resources/*.icns',
+                     'Turi Create Object Detection Annotation.app/Contents/Resources/*.js',
+                     'Turi Create Object Detection Annotation.app/Contents/Resources/*.html',
+                     'Turi Create Object Detection Annotation.app/Contents/Resources/Base.lproj/Main.storyboardc/*.nib',
+                     'Turi Create Object Detection Annotation.app/Contents/Resources/Base.lproj/Main.storyboardc/Info.plist',
+                     'Turi Create Object Detection Annotation.app/Contents/Resources/*.dylib',
+                     'Turi Create Object Detection Annotation.app/Contents/PkgInfo',
+                     'Turi Create Object Detection Annotation.app/Contents/MacOS/Turi Create Object Detection Annotation',
+
                      # Linux visualization
 		     'Turi Create Visualization/icudtl.dat',
 		     'Turi Create Visualization/visualization_client',

@@ -1,6 +1,7 @@
 project(Turi)
 
 subdirs(
+  annotation
   toolkits
   cppipc
   dot_graph_printer
@@ -32,4 +33,3 @@ subdirs(
   util
   visualization
   )
-
