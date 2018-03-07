@@ -52,11 +52,16 @@ $(document).ready(function(){
     window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'loaded'});
     context = document.getElementById('canvas').getContext("2d");
 
+    $("#jump_to_next").click(function(){
+      $("#loading_container").css("display", "block");
+      window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'nextundefined', index: current_index-1});
+    });
+
     $( "#jump_to_row_number" ).on( "keydown", function(event) {
       if(event.which == 13){
          var jump_row_value = $("#jump_to_row_number").val();
 
-        if (jump_row_value === parseInt(jump_row_value, 10)){
+        if (jump_row_value == parseInt(jump_row_value, 10)){
           if(jump_row_value < 1 || jump_row_value > sframe_length){
               if(!error_disabled){
                 error_disabled = true
@@ -70,7 +75,7 @@ $(document).ready(function(){
                 }, 2000);
               }
             }else{
-              window.getSpecific(jump_row_value);
+              window.getSpecific(jump_row_value-1);
             }
           }else{
             if(!error_disabled){
@@ -343,6 +348,16 @@ window.displayImage = function(value){
         window.resizeImageCanvas(value);
         $("#loading_container").css("display", "none");
         clickable = true;
+
+        if(value.error != undefined){
+            $("#error_hint").html("There are no un-annotated images in the dataset")
+            $("#error_hint").css("left", "230px");
+            $("#error_hint").animate({"top": "0px"}, 300)
+            setTimeout(function(){
+              $("#error_hint").animate({"top": "-50px"}, 300, function(){
+              });
+            }, 2000);
+        }
     });
 }
 
@@ -479,25 +494,27 @@ window.findBottomRight = function(center_x, center_y, half_bounding_width, half_
 
 window.setAnnotations = function(value){
     $(document).ready(function(){
-        for(var r = 0; r < value.data.annotations.length; r++){
-            var center_x = parseInt(value.data.annotations[r].coordinates.x, 10);
-            var center_y = parseInt(value.data.annotations[r].coordinates.y, 10);
-            var half_bounding_width = parseInt(value.data.annotations[r].coordinates.width/2, 10);
-            var half_bounding_height = parseInt(value.data.annotations[r].coordinates.height/2, 10);
-            var data_label = value.data.annotations[r].label;
+        if(value.data.annotations){
+            for(var r = 0; r < value.data.annotations.length; r++){
+                var center_x = parseInt(value.data.annotations[r].coordinates.x, 10);
+                var center_y = parseInt(value.data.annotations[r].coordinates.y, 10);
+                var half_bounding_width = parseInt(value.data.annotations[r].coordinates.width/2, 10);
+                var half_bounding_height = parseInt(value.data.annotations[r].coordinates.height/2, 10);
+                var data_label = value.data.annotations[r].label;
 
-            center_x = parseInt((center_x/(ImageWidth*1.0/ResizedImageWidth)), 10)
-            center_y = parseInt((center_y/(ImageHeight*1.0/ResizedImageHeight)), 10)
+                center_x = parseInt((center_x/(ImageWidth*1.0/ResizedImageWidth)), 10)
+                center_y = parseInt((center_y/(ImageHeight*1.0/ResizedImageHeight)), 10)
 
-            half_bounding_width = parseInt(half_bounding_width/(ImageWidth*1.0/ResizedImageWidth), 10)
-            half_bounding_height = parseInt(half_bounding_height/(ImageHeight*1.0/ResizedImageHeight), 10)
+                half_bounding_width = parseInt(half_bounding_width/(ImageWidth*1.0/ResizedImageWidth), 10)
+                half_bounding_height = parseInt(half_bounding_height/(ImageHeight*1.0/ResizedImageHeight), 10)
 
-            var label_object = window.findLabelObj(data_label)
+                var label_object = window.findLabelObj(data_label)
 
-            var top_left_coordinates = window.findTopLeft(center_x, center_y, half_bounding_width, half_bounding_height);
-            var bottom_right_coordinates = window.findBottomRight(center_x, center_y, half_bounding_width, half_bounding_height);
+                var top_left_coordinates = window.findTopLeft(center_x, center_y, half_bounding_width, half_bounding_height);
+                var bottom_right_coordinates = window.findBottomRight(center_x, center_y, half_bounding_width, half_bounding_height);
 
-            bounding_box_array.push(new BoundingBox(JSON.parse(JSON.stringify(top_left_coordinates)), JSON.parse(JSON.stringify(bottom_right_coordinates)), label_object))
+                bounding_box_array.push(new BoundingBox(JSON.parse(JSON.stringify(top_left_coordinates)), JSON.parse(JSON.stringify(bottom_right_coordinates)), label_object))
+            }
         }
 
         window.drawBoundingBoxes();

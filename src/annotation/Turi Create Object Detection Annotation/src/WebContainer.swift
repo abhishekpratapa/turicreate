@@ -130,7 +130,14 @@ class WebContainer: NSObject, WKScriptMessageHandler {
             }
             
             self.pipe?.sendData(data: "{\"set\": {\"index\":"+String(index_num)+", \"annotations\":"+annotationDict+"}}")
+        
+        case "nextundefined":
+            guard let index_num = messageBody["index"] as? Int else {
+                assert(false, "Expected 'index' in sendrows")
+                return
+            }
             
+            self.pipe?.sendData(data: "{\"next\": "+String(index_num)+"}")
         default:
             assert(false)
             break

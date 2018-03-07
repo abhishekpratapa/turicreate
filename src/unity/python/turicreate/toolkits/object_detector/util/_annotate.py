@@ -12,8 +12,6 @@ def _path_to_object_detection_client():
 
 def _start_process():
     proc = __subprocess.Popen(_path_to_object_detection_client(), stdout=__subprocess.PIPE,stdin=__subprocess.PIPE)
-    # TODO: FIX window not popping in front
-
     return proc
 
 def _get_all_current_labels(sframe, annotation_column):
@@ -90,6 +88,23 @@ def _set_data_sframe(sframe, data, annotation_column, labels):
                     labels.append(data['label'])
     return sframe, labels
 
+def _next_unannotated_image(sframe, index, annotation_column):
+    filtered_annotations = sframe.filter_by([None, []], annotation_column)
+    filtered_annotations['__idx'] = filtered_annotations.apply(lambda x: x['__idx'] if x['__idx'] > index else None)
+    filtered_annotations.dropna('__idx')
+    filtered_annotations.materialize()
+
+    if(filtered_annotations.shape[0] == 0):
+        filtered_annotations = sframe.filter_by([None, []], annotation_column)
+        filtered_annotations['__idx'] = filtered_annotations.apply(lambda x: x['__idx'] if x['__idx'] < index else None)
+        filtered_annotations.dropna('__idx')
+        filtered_annotations.materialize()
+
+    if(filtered_annotations.shape[0] == 0):
+        return index, False
+    else:
+        return filtered_annotations["__idx"][0], True
+
 def _process_value(value, proc, data, annotation_column, image_column, labels):
     json_value = None
 
@@ -105,6 +120,12 @@ def _process_value(value, proc, data, annotation_column, image_column, labels):
             data, labels = _set_data_sframe(data, json_value['set'], annotation_column, labels)
         if 'get' in json_value:
             proc.stdin.write(__json.dumps(_sframe_index_to_json(data, json_value['get'], image_column, annotation_column, labels))+"\n")
+        if 'next' in json_value:
+            index, success = _next_unannotated_image(data, json_value['next'], annotation_column)
+            sdict = _sframe_index_to_json(data, index, image_column, annotation_column, labels)
+            if not (success):
+                sdict["error"] = True;
+            proc.stdin.write(__json.dumps(sdict)+"\n")
 
     return data, labels
 
