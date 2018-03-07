@@ -6,6 +6,25 @@ body{
     color:#777777;
 }
 
+.arrow_buttons{
+    font-size: 25px;
+    background: white;
+    border: 0px;
+    cursor:pointer;
+    color: #777777;
+}
+
+.arrow_buttons:hover{
+    color:#AAAAAA;
+}
+
+.center_button_container{
+    margin: 0 auto;
+    display:inline-box;
+    float:right;
+    margin-right:260px;
+}
+
 #canvas{
     position:absolute;
     top:0px;
@@ -38,15 +57,17 @@ body{
     padding-left: 15px;
     padding-right: 15px;
     border-radius: 25px;
+    color:#777777;
 }
 
 #add_label:hover{
     color: #FFFFFF;
-    background: #333333;
+    background: #777777;
 }
 
 #stats_container{
     padding: 10px;
+    color: #777777;
 }
 
 #label_container{
@@ -72,8 +93,33 @@ body{
 }
 
 .active_label{
-    background: #000FFF;
+    background: #108EE9;
     color: #FFFFFF;
+}
+
+.rowNumber{
+    background: #FFFFFF;
+    border: 1px solid #D9D9D9;
+    box-shadow: inset 0 1px 1px 0 rgba(0,0,0,0.21);
+    border-radius: 3px;
+    font-family: HelveticaNeue-Italic;
+    font-size: 12px;
+    color: rgba(0,0,0,0.25);
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-right: 27px;
+    padding-left: 7px;
+    width:102px;
+    float: right;
+    margin-top: 7px;
+    margin-right: 10px;
+}
+
+.enterSymbol{
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    cursor:pointer;
 }
 
 #footer_element{
@@ -91,6 +137,24 @@ body{
     height:845px;
     background:white;
     z-index:999;
+}
+
+#jump_to_next{
+    border:0;
+    cursor:pointer;
+    padding:7px;
+    padding-left:15px;
+    padding-right:15px;
+    margin-top:10px;
+    margin-left:10px;
+    border-radius: 20px;
+    color:#777777;
+    background:#FFFFFF;
+}
+
+#jump_to_next:hover{
+    background: #777777;
+    color:#FFFFFF;
 }
 
 #error_hint{

@@ -23,7 +23,14 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
     
     func windowShouldClose(_ sender: Any) -> Bool {
-        NSApplication.shared().terminate(self)
+        // Wait until status is updated on the client side before closing the application
+        SharedData.shared.webContainer?.termination{ error in
+            if error != nil {
+                print("Oops! Something went wrong...")
+            } else {
+                NSApplication.shared().terminate(self);
+            }
+        }
         return true
     }
 

@@ -1,7 +1,7 @@
 var $ = require("jquery");
 
 var current_index = 0;
-var sframe_length = 0;
+var sframe_length = 5000;
 var clickable = false;
 var ImageWidth = 0;
 var ImageHeight = 0;
@@ -26,7 +26,7 @@ var clickX = new Array();
 var clickY = new Array();
 var clickDrag = new Array();
 
-
+var error_disabled = false;
 
 // TODO: Create Bounding Box Class
 // TODO: Create Label Class
@@ -51,6 +51,42 @@ class BoundingBox {
 $(document).ready(function(){
     window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'loaded'});
     context = document.getElementById('canvas').getContext("2d");
+
+    $( "#jump_to_row_number" ).on( "keydown", function(event) {
+      if(event.which == 13){
+         var jump_row_value = $("#jump_to_row_number").val();
+
+        if (jump_row_value === parseInt(jump_row_value, 10)){
+          if(jump_row_value < 1 || jump_row_value > sframe_length){
+              if(!error_disabled){
+                error_disabled = true
+                $("#error_hint").html("the requested row_number is out of bounds")
+                $("#error_hint").css("left", "250px");
+                $("#error_hint").animate({"top": "0px"}, 300)
+                setTimeout(function(){
+                  $("#error_hint").animate({"top": "-50px"}, 300, function(){
+                    error_disabled = false;
+                  });
+                }, 2000);
+              }
+            }else{
+              window.getSpecific(jump_row_value);
+            }
+          }else{
+            if(!error_disabled){
+              error_disabled = true
+              $("#error_hint").html("the requested row_number is not an integer")
+              $("#error_hint").css("left", "250px");
+              $("#error_hint").animate({"top": "0px"}, 300)
+              setTimeout(function(){
+                $("#error_hint").animate({"top": "-50px"}, 300, function(){
+                  error_disabled = false;
+                });
+              }, 2000);
+            }
+          }
+       }
+    });
 
     function getLabel(name){
       for(var v = 0; v < label_array.length; v++){
@@ -477,6 +513,8 @@ window.drawBoundingBoxes = function(){
     context.lineWidth = 2;
 
     if(start_coordinates.length == 2 && end_coordinates.length == 2 && start_coordinates[0] != -1000 && start_coordinates[1] != -1000 && end_coordinates[0] != -1000 && end_coordinates[1] != -1000){
+      context.shadowColor = 'black';
+      context.shadowBlur = 10;
       context.beginPath();
       context.rect(start_coordinates[0],start_coordinates[1], end_coordinates[0]-start_coordinates[0], end_coordinates[1]-start_coordinates[1]);
       context.closePath();
@@ -490,6 +528,8 @@ window.drawBoundingBoxes = function(){
       context.strokeStyle = "#CCCCCC";
       context.lineJoin = "round";
       context.lineWidth = 2;
+      context.shadowColor = 'black';
+      context.shadowBlur = 5;
 
       context.beginPath();
       context.rect(bounding_box_array[v].topLeft[0], bounding_box_array[v].topLeft[1], bounding_box_array[v].bottomRight[0]-bounding_box_array[v].topLeft[0], bounding_box_array[v].bottomRight[1] - bounding_box_array[v].topLeft[1]);
@@ -502,12 +542,18 @@ window.drawBoundingBoxes = function(){
       position[1] -= close_box_size;
 
       context.fillStyle = "#CCCCCC";
+      context.shadowColor = 'black';
+      context.shadowBlur = 0;
+
       context.beginPath();
       context.fillRect(position[0], position[1], close_box_size+1, close_box_size+1);
       context.closePath();
       context.stroke();
 
       context.strokeStyle = "#333333";
+      context.shadowColor = 'black';
+      context.shadowBlur = 0;
+
       context.beginPath();
       context.moveTo(position[0]+2, position[1]+2);
       context.lineTo(position[0]+close_box_size-2, position[1]+close_box_size-2);
@@ -518,6 +564,8 @@ window.drawBoundingBoxes = function(){
       if(bounding_box_array[v].label != undefined){
         context.font = "15px Arial";
         context.fillStyle = "#CCCCCC";
+        context.shadowColor = 'black';
+        context.shadowBlur = 0;
 
         var label = bounding_box_array[v].label.text;
         var width_label = context.measureText(label).width;
@@ -527,6 +575,8 @@ window.drawBoundingBoxes = function(){
         context.stroke();
 
         context.fillStyle = "#333333";
+        context.shadowColor = 'black';
+        context.shadowBlur = 0;
         context.beginPath();
         context.fillText(label, position[0] - width_label - 2, position[1] + close_box_size - 2);
         context.stroke();
@@ -534,9 +584,11 @@ window.drawBoundingBoxes = function(){
     }
 
     if(selected != -1){
-      context.strokeStyle = "#0000FF";
+      context.strokeStyle = "#108EE9";
       context.lineJoin = "round";
       context.lineWidth = 6;
+      context.shadowColor = 'black';
+      context.shadowBlur = 10;
 
       context.beginPath();
       context.rect(bounding_box_array[0].topLeft[0], bounding_box_array[0].topLeft[1], bounding_box_array[0].bottomRight[0]-bounding_box_array[0].topLeft[0], bounding_box_array[0].bottomRight[1] - bounding_box_array[0].topLeft[1]);
@@ -548,7 +600,10 @@ window.drawBoundingBoxes = function(){
       position[0] -= close_box_size;
       position[1] -= close_box_size;
 
-      context.fillStyle = "#0000FF";
+      context.fillStyle = "#108EE9";
+      context.shadowColor = 'black';
+      context.shadowBlur = 0;
+
       context.beginPath();
       context.fillRect(position[0], position[1], close_box_size+3, close_box_size+3);
       context.closePath();
@@ -556,6 +611,9 @@ window.drawBoundingBoxes = function(){
 
       context.lineWidth = 2;
       context.strokeStyle = "#FFFFFF";
+      context.shadowColor = 'black';
+      context.shadowBlur = 0;
+
       context.beginPath();
       context.moveTo(position[0]+2, position[1]+2);
       context.lineTo(position[0]+close_box_size-2, position[1]+close_box_size-2);
@@ -565,7 +623,9 @@ window.drawBoundingBoxes = function(){
 
       if(bounding_box_array[0].label != undefined){
         context.font = "15px Arial";
-        context.fillStyle = "#0000FF";
+        context.fillStyle = "#108EE9";
+        context.shadowColor = 'black';
+        context.shadowBlur = 0;
 
         var label = bounding_box_array[0].label.text;
         var width_label = context.measureText(label).width;
@@ -590,6 +650,10 @@ window.drawBoundingBoxes = function(){
 window.getAnnotationsDictionary = function(){
   var annotation_dictionary = [];
   for(var c = 0; c < bounding_box_array.length; c++){
+    if(bounding_box_array[c].label == undefined){
+        continue;
+    }
+
     var top_left = window.find_top_left(bounding_box_array[c])
     var bottom_right = window.find_bottom_right(bounding_box_array[c])
 
@@ -598,6 +662,12 @@ window.getAnnotationsDictionary = function(){
 
     var box_width = parseInt(Math.abs(top_left[0] - bottom_right[0]*1.0), 10);
     var box_height = parseInt(Math.abs(top_left[1] - bottom_right[1]*1.0), 10);
+
+    center_x_val = parseInt((center_x_val*(ImageWidth*1.0/ResizedImageWidth)), 10)
+    center_y_val = parseInt((center_y_val*(ImageHeight*1.0/ResizedImageHeight)), 10)
+
+    box_width = parseInt(box_width*(ImageWidth*1.0/ResizedImageWidth), 10)
+    box_height = parseInt(box_height*(ImageHeight*1.0/ResizedImageHeight), 10)
 
     var annotation = {"label": bounding_box_array[c].label.text, "type": "rectangle", "coordinates":{"x": center_x_val, "y": center_y_val, "width": box_width, "height": box_height}}
     annotation_dictionary.push(annotation);
@@ -615,6 +685,11 @@ window.setIndex = function(value){
     });
 }
 
+window.terminationApplication = function(){
+  var annotation_dict = JSON.stringify(window.getAnnotationsDictionary());
+  window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'sendrows', annotations: annotation_dict, index: (current_index-1)});
+}
+
 window.getNext = function(){
   if(window.isValid()){
     if(clickable && current_index < sframe_length){
@@ -628,6 +703,30 @@ window.getNext = function(){
         });
     }
   }else{
+    $("#error_hint").html("All boxes must be labeled before proceeding")
+    $("#error_hint").css("left", "250px");
+    $("#error_hint").animate({"top": "0px"}, 300)
+    setTimeout(function(){
+      $("#error_hint").animate({"top": "-50px"}, 300)
+    }, 2000);
+  }
+}
+
+window.getSpecific = function(valid_index){
+  if(window.isValid()){
+    if(clickable && current_index < sframe_length){
+        clickable = false;
+        selected = -1
+        $(document).ready(function(){
+            $("#loading_container").css("display", "block");
+            var annotation_dict = JSON.stringify(window.getAnnotationsDictionary());
+            window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'sendrows', annotations: annotation_dict, index: (current_index-1)});
+            window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'getrows', index: parseInt(valid_index, 10)});
+        });
+    }
+  }else{
+    $("#error_hint").html("All boxes must be labeled before proceeding")
+    $("#error_hint").css("left", "250px");
     $("#error_hint").animate({"top": "0px"}, 300)
     setTimeout(function(){
       $("#error_hint").animate({"top": "-50px"}, 300)

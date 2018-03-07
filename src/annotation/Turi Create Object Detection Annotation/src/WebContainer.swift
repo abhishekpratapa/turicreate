@@ -146,7 +146,6 @@ class WebContainer: NSObject, WKScriptMessageHandler {
                 if err != nil {
                     // if we got here, we got a JS error
                     log(err.debugDescription)
-                    NSLog(err.debugDescription)
                 }
                 
                 debug_log("successfully sent data spec to JS")
@@ -154,4 +153,17 @@ class WebContainer: NSObject, WKScriptMessageHandler {
         }
     }
     
+    public func termination(completion: @escaping (Error?) -> Void) {
+        DispatchQueue.main.async {
+            self.view.evaluateJavaScript("window.terminationApplication();", completionHandler: {(value, err) in
+                if err != nil {
+                    // if we got here, we got a JS error
+                    log(err.debugDescription)
+                }
+                
+                debug_log("successfully sent annotations to Python")
+                completion(nil)
+            });
+        }
+    }
 }

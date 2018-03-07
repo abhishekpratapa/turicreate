@@ -13,6 +13,7 @@
 		9226E7C81F366F2E00C33A64 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9226E7C71F366F2E00C33A64 /* Assets.xcassets */; };
 		9226E7CB1F366F2E00C33A64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9226E7C91F366F2E00C33A64 /* Main.storyboard */; };
 		92A7D9361F36A90D00D47187 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 92A7D9351F36A90D00D47187 /* index.html */; };
+		FC0EE46A20502B4500962207 /* fontawesome.min.css in Resources */ = {isa = PBXBuildFile; fileRef = FC0EE46920502B4500962207 /* fontawesome.min.css */; };
 		FC1A87781FB1393100A67DAD /* index.css in Resources */ = {isa = PBXBuildFile; fileRef = FC1A87771FB1393100A67DAD /* index.css */; };
 		FC1A878E1FB14E2900A67DAD /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = FC1A878D1FB14E2000A67DAD /* index.js */; };
 		FC245BED1F4F541D009F54C6 /* WebContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC245BEC1F4F541D009F54C6 /* WebContainer.swift */; };
@@ -31,6 +32,7 @@
 		9226E7CA1F366F2E00C33A64 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9226E7CC1F366F2E00C33A64 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		92A7D9351F36A90D00D47187 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		FC0EE46920502B4500962207 /* fontawesome.min.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = fontawesome.min.css; sourceTree = "<group>"; };
 		FC1A87771FB1393100A67DAD /* index.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = index.css; sourceTree = "<group>"; };
 		FC1A87841FB14C3C00A67DAD /* package.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = package.json; sourceTree = "<group>"; };
 		FC1A87861FB14C3C00A67DAD /* index.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = index.js; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 		9226E7C21F366F2E00C33A64 /* Turi Create Object Detection Annotation */ = {
 			isa = PBXGroup;
 			children = (
+				FC0EE46820502B1700962207 /* deps */,
 				FC1A87811FB1463200A67DAD /* src */,
 				FC1A87771FB1393100A67DAD /* index.css */,
 				92A7D9351F36A90D00D47187 /* index.html */,
@@ -81,6 +84,14 @@
 				9226E7CC1F366F2E00C33A64 /* Info.plist */,
 			);
 			path = "Turi Create Object Detection Annotation";
+			sourceTree = "<group>";
+		};
+		FC0EE46820502B1700962207 /* deps */ = {
+			isa = PBXGroup;
+			children = (
+				FC0EE46920502B4500962207 /* fontawesome.min.css */,
+			);
+			path = deps;
 			sourceTree = "<group>";
 		};
 		FC1A87811FB1463200A67DAD /* src */ = {
@@ -190,6 +201,7 @@
 				92A7D9361F36A90D00D47187 /* index.html in Resources */,
 				9226E7C81F366F2E00C33A64 /* Assets.xcassets in Resources */,
 				FC1A878E1FB14E2900A67DAD /* index.js in Resources */,
+				FC0EE46A20502B4500962207 /* fontawesome.min.css in Resources */,
 				9226E7CB1F366F2E00C33A64 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
