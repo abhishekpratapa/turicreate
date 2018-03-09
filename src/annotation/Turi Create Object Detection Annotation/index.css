@@ -313,4 +313,37 @@ body{
     background:#7EC2F3
 }
 
+#image_similarity_container{
+    display: none;
+}
 
+#object_detection_container{
+    display:none;
+}
+
+#create_label_container{
+    
+}
+
+.similar_image_element{
+    display:inline-box;
+    width: 150px;
+    overflow: hidden;
+    position: relative;
+}
+
+.similar_image_src_element{
+    width: 150px;
+    height:auto;
+}
+
+.current_label_similar{
+    position:absolute;
+    top:0;
+    left:0;
+    color:#FFFFFF;
+}
+
+#similar_page{
+    display:none;
+}

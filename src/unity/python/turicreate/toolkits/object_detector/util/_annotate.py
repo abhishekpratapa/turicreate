@@ -51,6 +51,7 @@ def _get_all_current_labels(sframe, annotation_column):
 
     return aggregrate_sfm.unique().to_numpy().tolist()
 
+#TODO: resize image for faster transport
 def _convert_image_base64(image):
     from PIL import Image
     import base64
@@ -115,6 +116,7 @@ def _process_value(value, proc, data, annotation_column, image_column, labels):
 
     if json_value != None:
         if 'loaded' in json_value:
+            proc.stdin.write(__json.dumps({"data": {"setType": "ObjectDetection"}})+"\n")
             proc.stdin.write(__json.dumps(_sframe_index_to_json(data, 0, image_column, annotation_column, labels))+"\n")
         if 'set' in json_value:
             data, labels = _set_data_sframe(data, json_value['set'], annotation_column, labels)
@@ -129,6 +131,7 @@ def _process_value(value, proc, data, annotation_column, image_column, labels):
 
     return data, labels
 
+# TODO: skip or drop image columns that are undefined
 def annotate(data, image_column = 'image', annotation_column = 'annotations'):
     """
         Annotate your images loaded in either an SFrame or SArray (Only on Mac)
@@ -225,7 +228,7 @@ def annotate(data, image_column = 'image', annotation_column = 'annotations'):
 
     import sys
     if sys.platform != 'darwin':
-         raise NotImplementedError('Visualization is currently supported only on macOS.')
+         raise NotImplementedError('Annotation is currently supported only on macOS.')
 
     if image_column == None:
         raise ValueError("'image_column' cannot be 'None'")
@@ -266,6 +269,8 @@ def annotate(data, image_column = 'image', annotation_column = 'annotations'):
         raise TypeError("'data' must be an SFrame or SArray")
 
     proc = _start_process()
+    #TODO: Add line in here to specify Object Detection Annotation
+    #TODO add an animation sequence to specify object detection, buy time
     labels = _get_all_current_labels(data, annotation_column)
 
     while(proc.poll() == None):

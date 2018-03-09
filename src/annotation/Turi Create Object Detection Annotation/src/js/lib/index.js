@@ -26,17 +26,35 @@ var clickX = new Array();
 var clickY = new Array();
 var clickDrag = new Array();
 
+var AnnotationType = Object.freeze({"ObjectDetection":1, "ImageSimilarity":2 });
+var loaded_type = undefined;
+
+var similarity_current_image;
+var similarity_current_label;
+
 var error_disabled = false;
+
+var related_image_array = []
+
+var global_label_name = "";
 
 // TODO: Create Bounding Box Class
 // TODO: Create Label Class
 // TODO: Create labelLoadingClass
 
 class Label {
-    constructor(label_text, color) {
-        this.text = label_text;
-        this.color = color;
-    }
+  constructor(label_text, color) {
+      this.text = label_text;
+      this.color = color;
+  }
+}
+
+class RelatedImage {
+  constructor(image, key, label) {
+    this.image = image;
+    this.key = key;
+    this.label = label;
+  }
 }
 
 class BoundingBox {
@@ -49,8 +67,24 @@ class BoundingBox {
 
 
 $(document).ready(function(){
+
+    function getLabel(name){
+      for(var v = 0; v < label_array.length; v++){
+        if(name == label_array[v].text){
+          return label_array[v];
+        }
+      }
+      return undefined;
+    }
+
     window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'loaded'});
     context = document.getElementById('canvas').getContext("2d");
+
+    $("#assign_label").click(function(){
+      var label_name = $("#similarity_label").val();
+      processLabelName(label_name);
+      $("#similarity_label").val("");
+    });
 
     $("#jump_to_next").click(function(){
       $("#loading_container").css("display", "block");
@@ -93,15 +127,6 @@ $(document).ready(function(){
        }
     });
 
-    function getLabel(name){
-      for(var v = 0; v < label_array.length; v++){
-        if(name == label_array[v].text){
-          return label_array[v];
-        }
-      }
-      return undefined;
-    }
-
     $("#add_label").click(function(){
         $("#modal_background").css("display", "block");
         $("#add_label_container").css("display", "block");
@@ -134,13 +159,45 @@ $(document).ready(function(){
     });
 
     $("body").on("click", ".label_element", function(){
-      if(selected != -1){
+      if(loaded_type == AnnotationType.ObjectDetection){
+        if(selected != -1){
+          var label_name = this.innerHTML;
+          bounding_box_array[selected].label = getLabel(label_name);
+          window.renderLabels(label_array, getLabel(label_name))
+          window.drawBoundingBoxes();
+        }
+      }else{
         var label_name = this.innerHTML;
-        bounding_box_array[selected].label = getLabel(label_name);
         window.renderLabels(label_array, getLabel(label_name))
-        window.drawBoundingBoxes();
+        processLabelName(label_name);
       }
-    })
+    });
+
+    $("body").on("click", ".similar_image_element", function(){
+      var set_key = $(this).attr("data-key");
+      var label_object = getLabel(global_label_name);
+
+      $(this).find(".current_label_similar").css("background", label_object.color);
+      $(this).find(".current_label_similar").html(label_object.text);
+    });
+
+    function processLabelName(label_name){
+      var label_object = findLabelObj(label_name);
+
+      if(label_name != '' || label_name != undefined){
+        if(label_object != undefined){
+          window.renderLabels(label_array, undefined);
+          window.displaySimilar(label_name);
+          global_label_name = label_name;
+        }else{
+          label_array.push(new Label(JSON.parse(JSON.stringify(label_name)), "#"+window.generateColor(label_name)));
+          label_object = findLabelObj(label_name);
+          window.renderLabels(label_array, undefined);
+          window.displaySimilar(label_name);
+          global_label_name = label_name;
+        }
+      }
+    }
 
     $('#canvas').mousedown(function(e){
 
@@ -217,6 +274,17 @@ $(document).ready(function(){
       }
     });
 
+    $("#send_back").click(function(){
+      var label_array = []
+      $(".similar_image_element").each(function(){
+        var label = $(this).find(".current_label_similar").html();
+        if(label == global_label_name){
+          label_array.append($(this).find(".current_label_similar").attr("data-key"))
+        }
+      });
+      // TODO append, original index in label array
+      // label_array
+    });
 
     $('#canvas').mouseleave(function(e){
       release(false);
@@ -292,6 +360,20 @@ $(document).ready(function(){
     }
 });
 
+window.displaySimilar = function(label_name){
+  $("#whole_page").css("display", "none");
+  $("#similar_page").css("display", "inline");
+  $("#label_name_container").html(label_name)
+  $("#similar_image_container").html("");
+  for(var c = 0; c < related_image_array.length; c++){
+    if(related_image_array[c].label != undefined){
+      $("#similar_image_container").append("<div class='similar_image_element' data-key='"+related_image_array[c].key+"'><img class='similar_image_src_element' src='"+related_image_array[c].image+"'/><div class='current_label_similar' style='background:"+related_image_array[c].label.color+"'>"+related_image_array[c].label.text+"</div></div>")
+    }else{
+      $("#similar_image_container").append("<div class='similar_image_element' data-key='"+related_image_array[c].key+"'><img class='similar_image_src_element' src='"+related_image_array[c].image+"'/><div class='current_label_similar'></div></div>")
+    }
+  }
+}
+
 window.isValid = function(){
   var output_valid = true;
   for(var c = 0; c < bounding_box_array.length; c++){
@@ -339,40 +421,121 @@ window.find_top_right = function(box_array_element){
   return [x, y]
 }
 
+window.dispayAnnotation = function(){
+  $("#current_image_set").html("<img src='"+similarity_current_image+"' />");
+}
+
 window.displayImage = function(value){
     $(document).ready(function(){
-        $("#image_canvas_container").children('img').attr('src', value.data.image);
-        bounding_box_array = [];
-        window.loadLabels(value);
-        window.setIndex(value);
-        window.resizeImageCanvas(value);
-        $("#loading_container").css("display", "none");
-        clickable = true;
+        if(loaded_type == AnnotationType.ObjectDetection){
+          if(value.data.image){
+            $("#image_canvas_container").children('img').attr('src', value.data.image);
+          }
 
-        if(value.error != undefined){
-            $("#error_hint").html("There are no un-annotated images in the dataset")
-            $("#error_hint").css("left", "230px");
-            $("#error_hint").animate({"top": "0px"}, 300)
-            setTimeout(function(){
-              $("#error_hint").animate({"top": "-50px"}, 300, function(){
-              });
-            }, 2000);
+          bounding_box_array = [];
+          window.loadLabels(value);
+          window.setIndex(value);
+          window.resizeImageCanvas(value);
+          $("#loading_container").css("display", "none");
+          clickable = true;
+
+          if(value.error != undefined){
+              $("#error_hint").html("There are no un-annotated images in the dataset")
+              $("#error_hint").css("left", "230px");
+              $("#error_hint").animate({"top": "0px"}, 300)
+              setTimeout(function(){
+                $("#error_hint").animate({"top": "-50px"}, 300, function(){
+                });
+              }, 2000);
+          }
+        }
+
+        if(loaded_type == AnnotationType.ImageSimilarity){
+            if(value.classify){
+              similarity_current_image = value.classify.image;
+              similarity_current_label = value.classify.label;
+
+              $("#loading_container").css("display", "none");
+              window.loadLabelsColors(value.classify.labels);
+              related_image_array = []
+
+              for (var key in value.classify.related) {
+                if(value.classify.related[key].label != undefined){
+                  related_image_array.push(new RelatedImage(value.classify.related[key].image, key, window.findLabelObj(value.classify.related[key].label)));
+                }else{
+                  related_image_array.push(new RelatedImage(value.classify.related[key].image, key, undefined));
+                }
+              }
+
+              window.dispayAnnotation();
+            }
+        }
+
+        if(value.data){
+          if(value.data.setType != undefined){
+            if(value.data.setType == "ObjectDetection"){
+              loaded_type = AnnotationType.ObjectDetection;
+              $("#object_detection_container").css("display", "block");
+              $("#image_similarity_container").css("display", "none");
+            }else if(value.data.setType == "ImageSimilarity"){
+              loaded_type = AnnotationType.ImageSimilarity;
+              $("#object_detection_container").css("display", "none");
+              $("#image_similarity_container").css("display", "block");
+            }
+          }
         }
     });
 }
 
+window.djb2 = function(str){
+  var hash = 5381;
+  for (var i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i); /* hash * 33 + c */
+  }
+  return hash;
+}
+
+
+window.generateColor = function(value){
+  var hash = djb2(value);
+  var r = (hash & 0xFF0000) >> 16;
+  var g = (hash & 0x00FF00) >> 8;
+  var b = hash & 0x0000FF;
+  return (("0" + r.toString(16)).substr(-2) + ("0" + g.toString(16)).substr(-2) + ("0" + b.toString(16)).substr(-2));
+}
+
+window.loadLabelsColors = function(labels){
+  if(labels){
+      for(var x = 0; x < labels.length; x++){
+          var found = false;
+          for(var r = 0; r < label_array.length; r++){
+              if(labels[x] == label_array[r].text){
+                  found = true;
+                  break;
+              }
+          }
+          if(!found){
+              label_array.push(new Label(JSON.parse(JSON.stringify(labels[x])), "#"+window.generateColor(labels[x])));
+          }
+      }
+    }
+    window.renderLabels(label_array, undefined);
+}
+
 window.loadLabels = function(value){
-    for(var x = 0; x < value.data.labels.length; x++){
-        var found = false;
-        for(var r = 0; r < label_array.length; r++){
-            if(value.data.labels[x] == label_array[r].text){
-                found = true;
-                break;
-            }
-        }
-        if(!found){
-            label_array.push(new Label(JSON.parse(JSON.stringify(value.data.labels[x])), "#333333"));
-        }
+  if(value.data.labels){
+      for(var x = 0; x < value.data.labels.length; x++){
+          var found = false;
+          for(var r = 0; r < label_array.length; r++){
+              if(value.data.labels[x] == label_array[r].text){
+                  found = true;
+                  break;
+              }
+          }
+          if(!found){
+              label_array.push(new Label(JSON.parse(JSON.stringify(value.data.labels[x])), "#333333"));
+          }
+      }
     }
     window.renderLabels(label_array, undefined);
 }
@@ -382,7 +545,7 @@ window.renderLabels = function(render_label_array, label_highlited){
     $("#label_container").html("");
     for(var x = 0; x < render_label_array.length; x++){
       if(label_highlited != render_label_array[x]){
-        $("#label_container").append("<div class=\"label_element\">"+render_label_array[x].text+"</div>")
+        $("#label_container").append("<div class=\"label_element\" style=\"color:#FFFFFF;background:"+render_label_array[x].color+"\">"+render_label_array[x].text+"</div>")
       }else{
         $("#label_container").append("<div class=\"label_element active_label\">"+render_label_array[x].text+"</div>")
       }
@@ -703,8 +866,12 @@ window.setIndex = function(value){
 }
 
 window.terminationApplication = function(){
-  var annotation_dict = JSON.stringify(window.getAnnotationsDictionary());
-  window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'sendrows', annotations: annotation_dict, index: (current_index-1)});
+  if(loaded_type == AnnotationType.ObjectDetection){
+    var annotation_dict = JSON.stringify(window.getAnnotationsDictionary());
+    window.webkit.messageHandlers["scriptHandler"].postMessage({status: 'sendrows', annotations: annotation_dict, index: (current_index-1)});
+  }else if(loaded_type == AnnotationType.ImageSimilarity){
+    // TODO: add proper close behavior here
+  }
 }
 
 window.getNext = function(){

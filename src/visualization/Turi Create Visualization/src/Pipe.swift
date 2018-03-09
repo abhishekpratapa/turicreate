@@ -70,6 +70,7 @@ class Pipe {
     }
     
     private func process_data(data: String) {
+        print(data)
         do {
             // expect "data" to contain JSON of the form [String: Any]
             let json = try JSON.parse(str: data) as! [String: Any]
