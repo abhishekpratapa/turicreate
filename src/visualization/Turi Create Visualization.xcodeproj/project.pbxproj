@@ -19,10 +19,14 @@
 		FC13DE8B1F8D4BBE007A3A02 /* vega-tooltip.min.js in Resources */ = {isa = PBXBuildFile; fileRef = FC13DE8A1F8D4BBE007A3A02 /* vega-tooltip.min.js */; };
 		FC13DE8D1F8D4BD6007A3A02 /* vega-tooltip.min.css in Resources */ = {isa = PBXBuildFile; fileRef = FC13DE8C1F8D4BD6007A3A02 /* vega-tooltip.min.css */; };
 		FC1A87781FB1393100A67DAD /* table_view.css in Resources */ = {isa = PBXBuildFile; fileRef = FC1A87771FB1393100A67DAD /* table_view.css */; };
-		FC1A878E1FB14E2900A67DAD /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = FC1A878D1FB14E2000A67DAD /* index.js */; };
 		FC245BED1F4F541D009F54C6 /* VegaContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC245BEC1F4F541D009F54C6 /* VegaContainer.swift */; };
 		FC245BF31F4F7FFB009F54C6 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC245BF21F4F7FFB009F54C6 /* JSON.swift */; };
 		FC245BF51F4F8110009F54C6 /* Pipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC245BF41F4F8110009F54C6 /* Pipe.swift */; };
+		FC56D7E6206426860000AD9C /* Plot.js in Resources */ = {isa = PBXBuildFile; fileRef = FC56D7E5206426860000AD9C /* Plot.js */; };
+		FC56D7EA2064272B0000AD9C /* Summary.js in Resources */ = {isa = PBXBuildFile; fileRef = FC56D7E92064272B0000AD9C /* Summary.js */; };
+		FC56D7EC2064482B0000AD9C /* Table.css in Resources */ = {isa = PBXBuildFile; fileRef = FC56D7EB2064482B0000AD9C /* Table.css */; };
+		FC56D7EE206448360000AD9C /* Plot.css in Resources */ = {isa = PBXBuildFile; fileRef = FC56D7ED206448360000AD9C /* Plot.css */; };
+		FC56D7F0206448420000AD9C /* Summary.css in Resources */ = {isa = PBXBuildFile; fileRef = FC56D7EF206448420000AD9C /* Summary.css */; };
 		FC5F0B3C1F5F3A3E0001BCEE /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC5F0B3B1F5F3A3E0001BCEE /* Error.swift */; };
 		FC9066011F425B4800AE3881 /* AppData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC9066001F425B4800AE3881 /* AppData.swift */; };
 		FCE18BB31F8D4A05006F2730 /* d3.v4.min.js in Resources */ = {isa = PBXBuildFile; fileRef = FCE18BB21F8D4A05006F2730 /* d3.v4.min.js */; };
@@ -48,10 +52,14 @@
 		FC1A87861FB14C3C00A67DAD /* index.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = index.js; sourceTree = "<group>"; };
 		FC1A87881FB14C3C00A67DAD /* Table.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Table.js; sourceTree = "<group>"; };
 		FC1A87891FB14C3C00A67DAD /* webpack.config.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = webpack.config.js; sourceTree = "<group>"; };
-		FC1A878D1FB14E2000A67DAD /* index.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = index.js; sourceTree = "<group>"; };
 		FC245BEC1F4F541D009F54C6 /* VegaContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VegaContainer.swift; sourceTree = "<group>"; };
 		FC245BF21F4F7FFB009F54C6 /* JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 		FC245BF41F4F8110009F54C6 /* Pipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pipe.swift; sourceTree = "<group>"; };
+		FC56D7E5206426860000AD9C /* Plot.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Plot.js; sourceTree = "<group>"; };
+		FC56D7E92064272B0000AD9C /* Summary.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Summary.js; sourceTree = "<group>"; };
+		FC56D7EB2064482B0000AD9C /* Table.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Table.css; sourceTree = "<group>"; };
+		FC56D7ED206448360000AD9C /* Plot.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Plot.css; sourceTree = "<group>"; };
+		FC56D7EF206448420000AD9C /* Summary.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Summary.css; sourceTree = "<group>"; };
 		FC5F0B3B1F5F3A3E0001BCEE /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		FC9066001F425B4800AE3881 /* AppData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppData.swift; sourceTree = "<group>"; };
 		FCE18BB21F8D4A05006F2730 /* d3.v4.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = d3.v4.min.js; sourceTree = "<group>"; };
@@ -119,7 +127,6 @@
 		FC1A87821FB1464D00A67DAD /* js */ = {
 			isa = PBXGroup;
 			children = (
-				FC1A878C1FB14E2000A67DAD /* build */,
 				FC1A87891FB14C3C00A67DAD /* webpack.config.js */,
 				FC1A87841FB14C3C00A67DAD /* package.json */,
 				FC1A87851FB14C3C00A67DAD /* lib */,
@@ -152,17 +159,30 @@
 		FC1A87871FB14C3C00A67DAD /* elements */ = {
 			isa = PBXGroup;
 			children = (
-				FC1A87881FB14C3C00A67DAD /* Table.js */,
+				FC56D7E8206426BF0000AD9C /* Plot */,
+				FC56D7E7206426AF0000AD9C /* Explore */,
 			);
 			path = elements;
 			sourceTree = "<group>";
 		};
-		FC1A878C1FB14E2000A67DAD /* build */ = {
+		FC56D7E7206426AF0000AD9C /* Explore */ = {
 			isa = PBXGroup;
 			children = (
-				FC1A878D1FB14E2000A67DAD /* index.js */,
+				FC1A87881FB14C3C00A67DAD /* Table.js */,
+				FC56D7EB2064482B0000AD9C /* Table.css */,
 			);
-			path = build;
+			path = Explore;
+			sourceTree = "<group>";
+		};
+		FC56D7E8206426BF0000AD9C /* Plot */ = {
+			isa = PBXGroup;
+			children = (
+				FC56D7E5206426860000AD9C /* Plot.js */,
+				FC56D7E92064272B0000AD9C /* Summary.js */,
+				FC56D7ED206448360000AD9C /* Plot.css */,
+				FC56D7EF206448420000AD9C /* Summary.css */,
+			);
+			path = Plot;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -225,6 +245,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC56D7F0206448420000AD9C /* Summary.css in Resources */,
+				FC56D7EC2064482B0000AD9C /* Table.css in Resources */,
 				FC1A87781FB1393100A67DAD /* table_view.css in Resources */,
 				FC13DE8B1F8D4BBE007A3A02 /* vega-tooltip.min.js in Resources */,
 				FCE18BB31F8D4A05006F2730 /* d3.v4.min.js in Resources */,
@@ -233,7 +255,9 @@
 				FCE18BB51F8D4ACF006F2730 /* vega.min.js in Resources */,
 				9226E7C81F366F2E00C33A64 /* Assets.xcassets in Resources */,
 				FC13DE891F8D4BB0007A3A02 /* vega-embed.min.js in Resources */,
-				FC1A878E1FB14E2900A67DAD /* index.js in Resources */,
+				FC56D7E6206426860000AD9C /* Plot.js in Resources */,
+				FC56D7EA2064272B0000AD9C /* Summary.js in Resources */,
+				FC56D7EE206448360000AD9C /* Plot.css in Resources */,
 				9226E7CB1F366F2E00C33A64 /* Main.storyboard in Resources */,
 				FC13DE871F8D4B9F007A3A02 /* vega-lite.min.js in Resources */,
 			);

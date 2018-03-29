@@ -46,6 +46,9 @@ class Pipe {
 
         #endif
         
+        process_data(data: Debugging.BoxesAndWhiskers.spec)
+        process_data(data: Debugging.BoxesAndWhiskers.data)
+        
         while (true) {
             guard let data = readLine() else {
                 // nil readLine result means EOF
@@ -80,6 +83,7 @@ class Pipe {
             
             if let vega_spec = json["vega_spec"] as? [String: Any] {
                 self.graph_data.set_vega(vega_spec: vega_spec)
+
             }
             
             if let data_spec = json["data_spec"] as? [String: Any] {
@@ -89,6 +93,12 @@ class Pipe {
             if let image_spec = json["image_spec"] as? [String: Any] {
                 self.graph_data.add_images(image_spec: image_spec)
             }
+            
+            if let modal_spec = json["modal_spec"] as? [String: Any] {
+                // TODO: process data
+                NSLog(data)
+            }
+
 
         } catch let error as NSError {
             log("Got error: \"\(error.localizedDescription)\" while trying to read:\n\(data)\n")

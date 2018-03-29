@@ -1,0 +1,46 @@
+Pointers
+------------
+0x109efce27
+0x10a81daa0
+0x10a811a8d
+0x10a80cdd5
+0x10a80942d
+0x10a808f79
+0x1079b97fb
+0x1079b94b8
+0x1079b91f5
+0x7fff4fb786c1
+0x7fff4fb7856d
+0x7fff4fb77c5d
+Raw
+------------
+0   libunity_shared.dylib               0x0000000109efce27 _Z18__print_back_tracev + 455
+1   libunity_shared.dylib               0x000000010a81daa0 _ZZZZN4turi12unity_sframe7exploreERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEES9_ENK4$_52clEvENKUlS7_mE_clES7_mENKUlvE_clEv + 1600
+2   libunity_shared.dylib               0x000000010a811a8d _ZZZN4turi12unity_sframe7exploreERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEES9_ENK4$_52clEvENKUlS7_mE_clES7_m + 2221
+3   libunity_shared.dylib               0x000000010a80cdd5 _ZZN4turi12unity_sframe7exploreERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEES9_ENK4$_52clEv + 14741
+4   libunity_shared.dylib               0x000000010a80942d _ZNSt3__128__invoke_void_return_wrapperIvE6__callIJRZN4turi12unity_sframe7exploreERKNS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEESC_E4$_52EEEvDpOT_ + 45
+5   libunity_shared.dylib               0x000000010a808f79 _ZNSt3__110__function6__funcIZN4turi12unity_sframe7exploreERKNS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEESB_E4$_52NS7_ISC_EEFvvEEclEv + 41
+6   libunity_shared.dylib               0x00000001079b97fb _ZNKSt3__18functionIFvvEEclEv + 123
+7   libunity_shared.dylib               0x00000001079b94b8 _ZZN4turi13visualization10run_threadENSt3__18functionIFvvEEEENK3$_0clEv + 24
+8   libunity_shared.dylib               0x00000001079b91f5 _ZNSt3__114__thread_proxyINS_5tupleIJNS_10unique_ptrINS_15__thread_structENS_14default_deleteIS3_EEEEZN4turi13visualization10run_threadENS_8functionIFvvEEEE3$_0EEEEEPvSE_ + 517
+9   libsystem_pthread.dylib             0x00007fff4fb786c1 _pthread_body + 340
+10  libsystem_pthread.dylib             0x00007fff4fb7856d _pthread_body + 0
+11  libsystem_pthread.dylib             0x00007fff4fb77c5d thread_start + 13
+
+Demangled
+------------
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+-------------------------------------------------------
+
+
