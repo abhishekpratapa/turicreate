@@ -41,6 +41,7 @@ class VegaContainer: NSObject, WKScriptMessageHandler {
         // super init call
         super.init()
         
+        self.view.setMagnification(2.0, centeredAt: CGPoint(x: 100, y: 100))
         // start the pipe
         self.pipe = Pipe(graph_data: self)
         

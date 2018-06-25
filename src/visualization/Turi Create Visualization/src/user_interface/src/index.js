@@ -22,13 +22,13 @@ document.onkeydown = function(e) {
     
     if(key_code == PLUS_KEY && command_down > 0){
         body_zoom += 10;
-        document.body.style.zoom = body_zoom+"%"
+        document.html.style.zoom = body_zoom+"%"
     }
     
     if(key_code == MINUS_KEY && command_down > 0){
         if(body_zoom > 10){
             body_zoom -= 10;
-            document.body.style.zoom = body_zoom+"%"
+            document.html.style.zoom = body_zoom+"%"
         }
     }
 };
