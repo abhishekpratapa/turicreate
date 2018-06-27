@@ -514,3 +514,4 @@ scenario_tests_mac_python27_10_14:
     - export VIRTUALENV="/Library/Frameworks/Python.framework/Versions/2.7/bin/virtualenv"
     - cd scenario-tests
     - ./run_scenario_tests.sh ../target/turicreate-*.whl
+
