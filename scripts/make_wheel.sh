@@ -245,8 +245,7 @@ package_wheel() {
       if [ $OSTYPE == "msys" ] && [ $f == "./pylambda_worker.exe" ]; then
         echo "Skipping pylambda_worker"
       else
-        echo "Stripping $f"
-        strip --strip-unneeded $f;
+        echo "Not Stripping $f"
       fi
     done
 
