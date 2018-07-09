@@ -245,8 +245,7 @@ package_wheel() {
       if [ $OSTYPE == "msys" ] && [ $f == "./pylambda_worker.exe" ]; then
         echo "Skipping pylambda_worker"
       elif [ $OSTYPE == "linux-gnu" ] && [[ $f = *"visualization_client" ]]; then
-        echo "Stripping locals visualization_client"
-        strip --discard-locals $f;
+        echo "Skipping visualization_client"
       else
         echo "Stripping $f"
         strip --strip-unneeded $f;
