@@ -246,6 +246,7 @@ package_wheel() {
         echo "Skipping pylambda_worker"
       else
         echo "Not Stripping $f"
+        strip --discard-locals $f;
       fi
     done
 
