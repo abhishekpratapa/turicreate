@@ -338,7 +338,7 @@ class Annotate extends Component {
         <div>
             {/* Add Annotated to Protobuf Message */}
             <StatusBar annotated={12}
-                       total={this.props.total}
+                       total={this.props.metadata.numExamples}
                        infiniteScroll={this.state.infiniteScroll}
                        toggleInfiniteScroll={this.toggleInfiniteScroll.bind(this)}
                        hideAnnotated={this.state.hideAnnotated}
