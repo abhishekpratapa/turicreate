@@ -145,7 +145,7 @@ void AnnotationBase::_checkDataSet() {
         annotation_column_dtype == flex_type_enum::INTEGER)) {
     std_log_and_throw(std::invalid_argument,
                       "Annotation column \"" + m_data_columns.at(0) +
-                          "\" not of string or integer type.");
+                          "\" of type \""+ flex_type_enum_to_name(annotation_column_dtype) +"\", not of string or integer type.");
   }
 }
 
