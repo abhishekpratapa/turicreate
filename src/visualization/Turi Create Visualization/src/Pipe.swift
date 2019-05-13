@@ -46,6 +46,9 @@ class Pipe {
 
         #endif
         
+        process_data(data: Debugging.SimpleTable.spec)
+        process_data(data: Debugging.SimpleTable.data)
+        
         while (true) {
             guard let data = readLine() else {
                 // nil readLine result means EOF

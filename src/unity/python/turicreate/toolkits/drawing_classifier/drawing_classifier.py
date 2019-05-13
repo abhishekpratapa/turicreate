@@ -309,6 +309,8 @@ def create(input_dataset, target, feature=None, validation_set='auto',
                     kwargs["validation_accuracy"] = validation_accuracy.get()[1]
                 table_printer.print_row(**kwargs)
 
+    model.save_params("drawing_model.params")
+
     state = {
         '_model': model,
         '_class_to_index': class_to_index,
