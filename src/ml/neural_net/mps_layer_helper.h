@@ -21,21 +21,30 @@ API_AVAILABLE(macos(10.14))
                                                       device:(id<MTLDevice> _Nonnull)dev
                                                    cmd_queue:(id<MTLCommandQueue> _Nonnull) cmd_q;
 
-+ (MPSCNNConvolutionNode *_Nonnull) createConvolutional:(MPSNNImageNode * _Nonnull)inputNode
-                                            kernelWidth:(int)kernelWidth
-                                           kernelHeight:(int)kernelHeight
-                                   inputFeatureChannels:(int)inputFeatureChannels
-                                  outputFeatureChannels:(int)outputFeatureChannels
-                                            strideWidth:(int)strideWidth
-                                           strideHeight:(int)strideHeight
-                                           paddingWidth:(int)paddingWidth
-                                          paddingHeight:(int)paddingHeight
-                                                weights:(float * _Nonnull)weights
-                                                 biases:(float * _Nonnull)biases
-                                                  label:(NSString * _Nonnull)label
-                                          updateWeights:(bool)updateWeights
-                                                 device:(id<MTLDevice> _Nonnull)dev
-                                              cmd_queue:(id<MTLCommandQueue> _Nonnull) cmd_q;
++ (MPSCNNConvolutionNode * _Nonnull) createConvolutional:(MPSNNImageNode * _Nonnull)inputNode
+                                             kernelWidth:(int)kernelWidth
+                                            kernelHeight:(int)kernelHeight
+                                    inputFeatureChannels:(int)inputFeatureChannels
+                                   outputFeatureChannels:(int)outputFeatureChannels
+                                             strideWidth:(int)strideWidth
+                                            strideHeight:(int)strideHeight
+                                            paddingWidth:(int)paddingWidth
+                                           paddingHeight:(int)paddingHeight
+                                                 weights:(float * _Nonnull)weights
+                                                  biases:(float * _Nonnull)biases
+                                                   label:(NSString * _Nonnull)label
+                                           updateWeights:(bool)updateWeights
+                                                  device:(id<MTLDevice> _Nonnull)dev
+                                               cmd_queue:(id<MTLCommandQueue> _Nonnull) cmd_q;
+
++ (MPSCNNInstanceNormalizationNode * _Nonnull) createInstanceNormalization:(MPSNNImageNode * _Nonnull)inputNode
+                                                                  channels:(int)channels
+                                                                    styles:(int)styles
+                                                                     gamma:(float * _Nonnull * _Nonnull)gamma
+                                                                      beta:(float * _Nonnull * _Nonnull)beta
+                                                                     label:(NSString * _Nonnull)label
+                                                                    device:(id<MTLDevice> _Nonnull)dev
+                                                                 cmd_queue:(id<MTLCommandQueue> _Nonnull)cmd_q;
 
 @end
 

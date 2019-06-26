@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define nonnull_cast_a(_a)                                                       \
+#define nonnull_cast_a(_a)                                                     \
   ({                                                                           \
     __typeof__(*(_a)) *__nullable a = (__typeof__(*(a)) *__nullable)(_a);      \
     assert((a) != NULL);                                                       \

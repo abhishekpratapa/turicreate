@@ -62,12 +62,12 @@ API_AVAILABLE(macos(10.14))
 }
 
 - (id) initWithParams:(NSString *)name
-     gammaWeights:(float **)gammaWeights
-      betaWeights:(float **)betaWeights
+         gammaWeights:(float **)gammaWeights
+          betaWeights:(float **)betaWeights
 numberFeatureChannels:(int)numberFeatureChannels
-         styles:(int)styles
-         device:(id<MTLDevice> _Nonnull)dev
-      cmd_queue:(id<MTLCommandQueue> _Nonnull) cmd_q;
+               styles:(int)styles
+               device:(id<MTLDevice> _Nonnull)dev
+            cmd_queue:(id<MTLCommandQueue> _Nonnull) cmd_q;
 
 - (void) updateNumberOfStyles:(int)styles;
 - (void) updateCurrentStyle:(int)style;

@@ -1,6 +1,7 @@
 #include <ml/neural_net/mps_layer_helper.h>
 
 #include <ml/neural_net/mps_layer_fully_connected_data_loader.h>
+#include <ml/neural_net/mps_layer_instance_norm_data_loader.h>
 
 #include <ml/neural_net/mps_layer_conv_data_loader.h>
 #include <ml/neural_net/mps_layer_conv_padding.h>
@@ -74,6 +75,28 @@
   ConvNode.paddingPolicy = Padding;
   
 	return ConvNode;
+}
+
++ (MPSCNNInstanceNormalizationNode * _Nonnull) createInstanceNormalization:(MPSNNImageNode * _Nonnull)inputNode
+                                                                  channels:(int)channels
+                                                                    styles:(int)styles
+                                                                     gamma:(float * _Nonnull * _Nonnull)gamma
+                                                                      beta:(float * _Nonnull * _Nonnull)beta
+                                                                     label:(NSString * _Nonnull)label
+                                                                    device:(id<MTLDevice> _Nonnull)dev
+                                                                 cmd_queue:(id<MTLCommandQueue> _Nonnull)cmd_q {
+
+  InstanceNormDataLoader *instNormDataLoad = [[InstanceNormDataLoader alloc] initWithParams:label
+                                                                                gammaWeights:gamma
+                                                                                 betaWeights:beta
+                                                                       numberFeatureChannels:channels
+                                                                                      styles:styles
+                                                                                      device:dev
+                                                                                   cmd_queue:cmd_q];
+    
+  MPSCNNInstanceNormalizationNode *instanceNorm =  [MPSCNNInstanceNormalizationNode nodeWithSource:inputNode dataSource:instNormDataLoad];
+  
+  return instanceNorm;
 }
 
 @end

@@ -6,7 +6,7 @@
                          inputNode:(MPSNNImageNode * _Nonnull)inputNode
                             device:(id<MTLDevice> _Nonnull)dev
                          cmd_queue:(id<MTLCommandQueue> _Nonnull)cmd_q
-                       initWeights:(struct weights* _Nonnull)w {
+                       initWeights:(struct DecodingWeights) weights {
   @autoreleasepool {
     self = [super init];
     return self;
