@@ -1,4 +1,5 @@
 #include <toolkits/style_transfer/sub_layers/decoding.h>
+#include <ml/neural_net/mps_layer_helper.h>
 
 @implementation Decoding
 
@@ -9,20 +10,55 @@
                        initWeights:(struct DecodingWeights) weights {
   @autoreleasepool {
     self = [super init];
+    
+    upsample = [MPSCNNUpsamplingNearestNode nodeWithSource:inputNode
+                                       integerScaleFactorX:weights.upsample.scale
+                                       integerScaleFactorY:weights.upsample.scale];
+
+    conv = [TCMPSLayerHelper createConvolutional:[upsample resultImage]
+                                     kernelWidth:weights.conv.kernelWidth
+                                    kernelHeight:weights.conv.kernelHeight
+                            inputFeatureChannels:weights.conv.inputFeatureChannels
+                           outputFeatureChannels:weights.conv.outputFeatureChannels
+                                     strideWidth:weights.conv.strideWidth
+                                    strideHeight:weights.conv.strideHeight
+                                    paddingWidth:weights.conv.paddingWidth
+                                   paddingHeight:weights.conv.paddingHeight
+                                         weights:weights.conv.weights
+                                          biases:weights.conv.biases
+                                           label:weights.conv.label
+                                   updateWeights:weights.conv.updateWeights
+                                          device:dev
+                                       cmd_queue:cmd_q];
+
+    inst_norm = [TCMPSLayerHelper createInstanceNormalization:[conv resultImage]
+                                                     channels:weights.inst.channels
+                                                       styles:weights.inst.styles
+                                                        gamma:weights.inst.gamma
+                                                         beta:weights.inst.beta
+                                                        label:weights.inst.label
+                                                       device:dev
+                                                    cmd_queue:cmd_q];
+
+    relu = [MPSCNNNeuronReLUNNode nodeWithSource: [inst_norm resultImage]];
+
+    m_output = [relu resultImage];
+
     return self;
   }
 }
 
 - (MPSNNImageNode * _Nullable) forwardPass {
-  return nil;
+  return m_output;
 }
 
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull) inputNode {
-  return nil;
-}
+  MPSNNGradientFilterNode* relu_grad  = [relu gradientFilterWithSource: inputNode];
+  MPSNNGradientFilterNode* inst_norm_grad = [inst_norm gradientFilterWithSource: [relu_grad resultImage]];
+  MPSNNGradientFilterNode* conv_grad = [conv gradientFilterWithSource: [inst_norm_grad resultImage]];
+  MPSNNGradientFilterNode* upsampling_grad = [relu gradientFilterWithSource: [conv_grad resultImage]];
 
-- (MPSCNNNeuronReLU * _Nullable) finalNode {
-  return nil;
+  return [upsampling_grad resultImage];
 }
 
 @end

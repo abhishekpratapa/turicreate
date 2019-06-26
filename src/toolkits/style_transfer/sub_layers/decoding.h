@@ -9,7 +9,14 @@
 #include <toolkits/style_transfer/utils.h>
 
 API_AVAILABLE(macos(10.14))
-@interface Decoding : NSObject
+@interface Decoding : NSObject {
+  MPSCNNUpsamplingNearestNode *upsample;
+  MPSCNNConvolutionNode *conv;
+  MPSCNNInstanceNormalizationNode *inst_norm;
+  MPSCNNNeuronReLUNNode *relu;
+
+  MPSNNImageNode *m_output;
+}
 
 - (id _Nonnull) initWithParameters:(NSString * _Nullable)name
                          inputNode:(MPSNNImageNode * _Nonnull)inputNode
@@ -19,7 +26,6 @@ API_AVAILABLE(macos(10.14))
 
 - (MPSNNImageNode * _Nullable) forwardPass;
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull) inputNode;
-- (MPSCNNNeuronReLU * _Nullable) finalNode;
 
 @end
 

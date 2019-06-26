@@ -24,6 +24,10 @@ struct InstanceNormalizationWeights {
   NSString * _Nonnull label;
 };
 
+struct UpsamplingWeights {
+  int scale;
+};
+
 struct EncodingWeights {
   struct ConvolutionWeights conv;
   struct InstanceNormalizationWeights inst;
@@ -39,6 +43,7 @@ struct ResidualWeights {
 struct DecodingWeights {
   struct ConvolutionWeights conv;
   struct InstanceNormalizationWeights inst;
+  struct UpsamplingWeights upsample;
 };
 
 struct StyleTransferWeights {
