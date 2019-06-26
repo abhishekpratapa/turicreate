@@ -47,6 +47,19 @@ struct DecodingWeights {
 };
 
 struct StyleTransferWeights {
+  struct EncodingWeights encode_1;
+  struct EncodingWeights encode_2;
+  struct EncodingWeights encode_3;
+
+  struct ResidualWeights residual_1;
+  struct ResidualWeights residual_2;
+  struct ResidualWeights residual_3;
+  struct ResidualWeights residual_4;
+  struct ResidualWeights residual_5;
+
+  struct DecodingWeights decode_1;
+  struct DecodingWeights decode_2;
+
   struct ConvolutionWeights conv;
   struct InstanceNormalizationWeights inst;
 };
