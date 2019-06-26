@@ -22,10 +22,10 @@ API_AVAILABLE(macos(10.14))
                          inputNode:(MPSNNImageNode * _Nonnull)inputNode
                             device:(id<MTLDevice> _Nonnull)dev
                          cmd_queue:(id<MTLCommandQueue> _Nonnull)cmd_q
-                       initWeights:(struct DecodingWeights) weights;
+                       initWeights:(struct DecodingWeights)weights;
 
 - (MPSNNImageNode * _Nullable) forwardPass;
-- (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull) inputNode;
+- (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull)inputNode;
 
 @end
 

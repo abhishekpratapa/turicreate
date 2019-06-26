@@ -7,7 +7,7 @@
                          inputNode:(MPSNNImageNode * _Nonnull)inputNode
                             device:(id<MTLDevice> _Nonnull)dev
                          cmd_queue:(id<MTLCommandQueue> _Nonnull)cmd_q
-                       initWeights:(struct DecodingWeights) weights {
+                       initWeights:(struct DecodingWeights)weights {
   @autoreleasepool {
     self = [super init];
     
@@ -52,7 +52,7 @@
   return m_output;
 }
 
-- (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull) inputNode {
+- (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull)inputNode {
   MPSNNGradientFilterNode* relu_grad = [relu gradientFilterWithSource: inputNode];
   MPSNNGradientFilterNode* inst_norm_grad = [inst_norm gradientFilterWithSource: [relu_grad resultImage]];
   MPSNNGradientFilterNode* conv_grad = [conv gradientFilterWithSource: [inst_norm_grad resultImage]];
