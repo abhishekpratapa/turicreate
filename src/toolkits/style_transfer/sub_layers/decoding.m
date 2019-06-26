@@ -53,7 +53,7 @@
 }
 
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull) inputNode {
-  MPSNNGradientFilterNode* relu_grad  = [relu gradientFilterWithSource: inputNode];
+  MPSNNGradientFilterNode* relu_grad = [relu gradientFilterWithSource: inputNode];
   MPSNNGradientFilterNode* inst_norm_grad = [inst_norm gradientFilterWithSource: [relu_grad resultImage]];
   MPSNNGradientFilterNode* conv_grad = [conv gradientFilterWithSource: [inst_norm_grad resultImage]];
   MPSNNGradientFilterNode* upsampling_grad = [relu gradientFilterWithSource: [conv_grad resultImage]];
