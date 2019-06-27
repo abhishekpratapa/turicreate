@@ -44,11 +44,16 @@
 }
 
 - (MPSNNImageNode * _Nullable) forwardPass {
-  return nil;
+  return m_output;
 }
 
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull) inputNode {
-  return nil;
+  MPSNNImageNode* block_4_img = [block_4 backwardPass: inputNode];
+  MPSNNImageNode* block_3_img = [block_3 backwardPass: block_4_img];
+  MPSNNImageNode* block_2_img = [block_2 backwardPass: block_3_img];
+  MPSNNImageNode* block_1_img = [block_1 backwardPass: block_2_img];
+  
+  return block_1_img;
 }
 
 @end

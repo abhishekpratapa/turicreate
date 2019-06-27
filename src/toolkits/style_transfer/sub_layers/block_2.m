@@ -83,7 +83,15 @@
 }
 
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull)inputNode {
-  return nil;
+  MPSNNGradientFilterNode* pooling_grad = [pooling gradientFilterWithSource: inputNode];
+  MPSNNGradientFilterNode* relu_3_grad = [relu_3 gradientFilterWithSource: [pooling_grad resultImage]];
+  MPSNNGradientFilterNode* conv_3_grad = [conv_3 gradientFilterWithSource: [relu_3_grad resultImage]];
+  MPSNNGradientFilterNode* relu_2_grad = [relu_2 gradientFilterWithSource: [conv_3_grad resultImage]];
+  MPSNNGradientFilterNode* conv_2_grad = [conv_2 gradientFilterWithSource: [relu_2_grad resultImage]];
+  MPSNNGradientFilterNode* relu_1_grad = [relu_1 gradientFilterWithSource: [conv_2_grad resultImage]];
+  MPSNNGradientFilterNode* conv_1_grad = [conv_1 gradientFilterWithSource: [relu_1_grad resultImage]];
+  
+  return [conv_1_grad resultImage];
 }
 
 @end
