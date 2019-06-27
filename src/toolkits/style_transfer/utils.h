@@ -28,6 +28,11 @@ struct UpsamplingWeights {
   int scale;
 };
 
+struct PoolingWeights {
+  int kernelSize;
+  int strideSize;
+};
+
 struct EncodingWeights {
   struct ConvolutionWeights conv;
   struct InstanceNormalizationWeights inst;
@@ -44,6 +49,26 @@ struct DecodingWeights {
   struct ConvolutionWeights conv;
   struct InstanceNormalizationWeights inst;
   struct UpsamplingWeights upsample;
+};
+
+struct Block1Weights {
+  struct ConvolutionWeights conv_1;
+  struct ConvolutionWeights conv_2;
+  struct PoolingWeights pooling;
+};
+
+struct Block2Weights {
+  struct ConvolutionWeights conv_1;
+  struct ConvolutionWeights conv_2;
+  struct ConvolutionWeights conv_3;
+  struct PoolingWeights pooling;
+};
+
+struct Vgg16Weights {
+  struct Block1Weights block_1;
+  struct Block1Weights block_2;
+  struct Block2Weights block_3;
+  struct Block2Weights block_4;
 };
 
 struct StyleTransferWeights {

@@ -1,0 +1,71 @@
+#include <toolkits/style_transfer/sub_layers/block_1.h>
+#include <ml/neural_net/mps_layer_helper.h>
+
+@implementation Block1
+
+- (id _Nonnull) initWithParameters:(NSString * _Nullable)name
+                         inputNode:(MPSNNImageNode * _Nonnull)inputNode
+                            device:(id<MTLDevice> _Nonnull)dev
+                         cmd_queue:(id<MTLCommandQueue> _Nonnull)cmd_q
+                       initWeights:(struct Block1Weights)weights {
+  @autoreleasepool {
+    self = [super init];
+
+    conv_1 = [TCMPSLayerHelper createConvolutional:inputNode
+                                       kernelWidth:weights.conv_1.kernelWidth
+                                      kernelHeight:weights.conv_1.kernelHeight
+                              inputFeatureChannels:weights.conv_1.inputFeatureChannels
+                             outputFeatureChannels:weights.conv_1.outputFeatureChannels
+                                       strideWidth:weights.conv_1.strideWidth
+                                      strideHeight:weights.conv_1.strideHeight
+                                      paddingWidth:weights.conv_1.paddingWidth
+                                     paddingHeight:weights.conv_1.paddingHeight
+                                           weights:weights.conv_1.weights
+                                            biases:weights.conv_1.biases
+                                             label:weights.conv_1.label
+                                     updateWeights:weights.conv_1.updateWeights
+                                            device:dev
+                                         cmd_queue:cmd_q];
+
+    relu_1 = [MPSCNNNeuronReLUNNode nodeWithSource: [conv_1 resultImage]];
+    
+    conv_2 = [TCMPSLayerHelper createConvolutional:[relu_1 resultImage]
+                                       kernelWidth:weights.conv_2.kernelWidth
+                                      kernelHeight:weights.conv_2.kernelHeight
+                              inputFeatureChannels:weights.conv_2.inputFeatureChannels
+                             outputFeatureChannels:weights.conv_2.outputFeatureChannels
+                                       strideWidth:weights.conv_2.strideWidth
+                                      strideHeight:weights.conv_2.strideHeight
+                                      paddingWidth:weights.conv_2.paddingWidth
+                                     paddingHeight:weights.conv_2.paddingHeight
+                                           weights:weights.conv_2.weights
+                                            biases:weights.conv_2.biases
+                                             label:weights.conv_2.label
+                                     updateWeights:weights.conv_2.updateWeights
+                                            device:dev
+                                         cmd_queue:cmd_q];
+
+    relu_2 = [MPSCNNNeuronReLUNNode nodeWithSource: [conv_2 resultImage]];
+
+    pooling = [[MPSCNNPoolingAverageNode alloc] initWithSource:[relu_2 resultImage]
+                                                   kernelWidth:weights.pooling.kernelSize
+                                                  kernelHeight:weights.pooling.kernelSize 
+                                               strideInPixelsX:weights.pooling.strideSize
+                                               strideInPixelsY:weights.pooling.strideSize];
+
+    m_feature = [relu_2 resultImage];
+    m_output = [pooling resultImage];
+
+    return self;  
+  }
+}
+
+- (MPSNNImageNode * _Nullable) forwardPass {
+  return m_output;
+}
+
+- (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull)inputNode {
+  return nil;
+}
+
+@end
