@@ -28,6 +28,10 @@ API_AVAILABLE(macos(10.14))
                        initWeights:(struct Vgg16Weights)weights;
 
 - (MPSNNImageNode * _Nullable) forwardPass;
+- (MPSNNImageNode * _Nonnull) firstRELU;
+- (MPSNNImageNode * _Nonnull) secondRELU;
+- (MPSNNImageNode * _Nonnull) thirdRELU;
+- (MPSNNImageNode * _Nonnull) fourthRELU;
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull) inputNode;
 
 @end

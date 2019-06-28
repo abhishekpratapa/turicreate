@@ -47,6 +47,22 @@
   return m_output;
 }
 
+- (MPSNNImageNode * _Nonnull) firstRELU {
+  return [block_1 feature];
+}
+
+- (MPSNNImageNode * _Nonnull) secondRELU {
+  return [block_2 feature];
+}
+
+- (MPSNNImageNode * _Nonnull) thirdRELU {
+  return [block_3 feature];
+}
+
+- (MPSNNImageNode * _Nonnull) fourthRELU {
+  return [block_4 feature];
+}
+
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull) inputNode {
   MPSNNImageNode* block_4_img = [block_4 backwardPass: inputNode];
   MPSNNImageNode* block_3_img = [block_3 backwardPass: block_4_img];

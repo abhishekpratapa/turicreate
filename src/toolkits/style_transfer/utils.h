@@ -71,7 +71,7 @@ struct Vgg16Weights {
   struct Block2Weights block_4;
 };
 
-struct StyleTransferWeights {
+struct TransformerWeights {
   struct EncodingWeights encode_1;
   struct EncodingWeights encode_2;
   struct EncodingWeights encode_3;

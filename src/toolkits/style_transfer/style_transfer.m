@@ -1,132 +1,186 @@
 #include <toolkits/style_transfer/style_transfer.h>
 #include <ml/neural_net/mps_layer_helper.h>
+#include <ml/neural_net/mps_node_handle.h>
 
-@implementation StyleTransferModel
+@implementation StyleTransfer
 
 - (id _Nonnull) initWithParameters:(NSString * _Nullable)name
-                         inputNode:(MPSNNImageNode * _Nonnull)inputNode
                             device:(id<MTLDevice> _Nonnull)dev
-                         cmd_queue:(id<MTLCommandQueue> _Nonnull)cmd_q
-                       initWeights:(struct StyleTransferWeights)weights {
+               transformer_weights:(struct TransformerWeights)transformer_weights
+                       vgg_weights:(struct Vgg16Weights)vgg_weights
+                         cmd_queue:(id<MTLCommandQueue> _Nonnull)cmd_q{
   @autoreleasepool {
     self = [super init];
 
-    encoding_1 = [[Encoding alloc] initWithParameters:@"transformer_encode_1"
-                                            inputNode:inputNode
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.encode_1];
+    MPSCNNLossDescriptor *style_desc = [MPSCNNLossDescriptor cnnLossDescriptorWithType:MPSCNNLossTypeMeanSquaredError
+                                                                         reductionType:MPSCNNReductionTypeMean];
+    style_desc.weight = 0.5*0.0001*0.0001;
 
-    encoding_2 = [[Encoding alloc] initWithParameters:@"transformer_encode_2"
-                                            inputNode:[encoding_1 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.encode_2];
+    MPSCNNLossDescriptor *content_desc = [MPSCNNLossDescriptor cnnLossDescriptorWithType:MPSCNNLossTypeMeanSquaredError
+                                                                           reductionType:MPSCNNReductionTypeMean];
+    content_desc.weight = 0.5*0.0001;
 
-    encoding_3 = [[Encoding alloc] initWithParameters:@"transformer_encode_3"
-                                            inputNode:[encoding_2 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.encode_3];
 
-    residual_1 = [[Residual alloc] initWithParameters:@"transformer_residual_1"
-                                            inputNode:[encoding_3 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.residual_1];
+    contentNode = [MPSNNImageNode nodeWithHandle: [[TCMPSGraphNodeHandle alloc] initWithLabel:@"contentImage"]];
+    contentScaleNode = [MPSNNImageNode nodeWithHandle: [[TCMPSGraphNodeHandle alloc] initWithLabel:@"contentScaleImage"]];
+    contenMeanNode = [MPSNNImageNode nodeWithHandle: [[TCMPSGraphNodeHandle alloc] initWithLabel:@"contentMeanImage"]];
 
-    residual_2 = [[Residual alloc] initWithParameters:@"transformer_residual_2"
-                                            inputNode:[residual_1 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.residual_2];
+    styleNode = [MPSNNImageNode nodeWithHandle: [[TCMPSGraphNodeHandle alloc] initWithLabel:@"styleImage"]];
+    styleScaleNode = [MPSNNImageNode nodeWithHandle: [[TCMPSGraphNodeHandle alloc] initWithLabel:@"styleScaleImage"]];
+    styleMeanNode = [MPSNNImageNode nodeWithHandle: [[TCMPSGraphNodeHandle alloc] initWithLabel:@"styleMeanImage"]];
 
-    residual_3 = [[Residual alloc] initWithParameters:@"transformer_residual_3"
-                                            inputNode:[residual_2 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.residual_2];
+    model = [[TransformerModel alloc] initWithParameters:@"Transformer"
+                                               inputNode:contentNode
+                                                  device:dev
+                                               cmd_queue:cmd_q
+                                             initWeights:transformer_weights];
 
-    residual_4 = [[Residual alloc] initWithParameters:@"transformer_residual_4"
-                                            inputNode:[residual_3 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.residual_4];
+    content_pre_process = [[PreProcessing alloc] initWithParameters:@"Pre_Process_Content"
+                                                          inputNode:[model forwardPass]
+                                                          scaleNode:contentScaleNode
+                                                           meanNode:contenMeanNode
+                                                             device:dev
+                                                          cmd_queue:cmd_q];
 
-    residual_5 = [[Residual alloc] initWithParameters:@"transformer_residual_5"
-                                            inputNode:[residual_4 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.residual_5];
 
-    decoding_1 = [[Decoding alloc] initWithParameters:@"transformer_decoding_1"
-                                            inputNode:[residual_5 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.decode_1];
+    content_vgg = [[VGG16Model alloc] initWithParameters:@"VGG_Content"
+                                               inputNode:[content_pre_process forwardPass]
+                                                  device:dev
+                                               cmd_queue:cmd_q
+                                             initWeights:vgg_weights];
 
-    decoding_2 = [[Decoding alloc] initWithParameters:@"transformer_decoding_2"
-                                            inputNode:[decoding_1 forwardPass]
-                                               device:dev
-                                            cmd_queue:cmd_q
-                                          initWeights:weights.decode_2];
+    style_pre_process_loss = [[PreProcessing alloc] initWithParameters:@"Pre_Process_Style_Loss"
+                                                             inputNode:styleNode
+                                                             scaleNode:styleScaleNode
+                                                              meanNode:styleMeanNode
+                                                                device:dev
+                                                             cmd_queue:cmd_q];
 
-    conv = [TCMPSLayerHelper createConvolutional:[decoding_2 forwardPass]
-                                     kernelWidth:weights.conv.kernelWidth
-                                    kernelHeight:weights.conv.kernelHeight
-                            inputFeatureChannels:weights.conv.inputFeatureChannels
-                           outputFeatureChannels:weights.conv.outputFeatureChannels
-                                     strideWidth:weights.conv.strideWidth
-                                    strideHeight:weights.conv.strideHeight
-                                    paddingWidth:weights.conv.paddingWidth
-                                   paddingHeight:weights.conv.paddingHeight
-                                         weights:weights.conv.weights
-                                          biases:weights.conv.biases
-                                           label:weights.conv.label
-                                   updateWeights:weights.conv.updateWeights
-                                          device:dev
-                                       cmd_queue:cmd_q];
+    style_vgg_loss = [[VGG16Model alloc] initWithParameters:@"VGG_Style_Loss"
+                                                  inputNode:[style_pre_process_loss forwardPass]
+                                                     device:dev
+                                                  cmd_queue:cmd_q
+                                                initWeights:vgg_weights];
 
-    inst_norm = [TCMPSLayerHelper createInstanceNormalization:[conv resultImage]
-                                                     channels:weights.inst.channels
-                                                       styles:weights.inst.styles
-                                                        gamma:weights.inst.gamma
-                                                         beta:weights.inst.beta
-                                                        label:weights.inst.label
+
+    content_pre_process_loss = [[PreProcessing alloc] initWithParameters:@"Pre_Process_Content_Loss"
+                                                               inputNode:contentNode
+                                                               scaleNode:contentScaleNode
+                                                                meanNode:contenMeanNode
+                                                                  device:dev
+                                                               cmd_queue:cmd_q];
+
+    
+    content_vgg_loss = [[VGG16Model alloc] initWithParameters:@"VGG_Content_Loss"
+                                                    inputNode:[content_pre_process_loss forwardPass]
                                                        device:dev
-                                                    cmd_queue:cmd_q];
+                                                    cmd_queue:cmd_q
+                                                  initWeights:vgg_weights];
 
-    sigmoid = [MPSCNNNeuronSigmoidNode nodeWithSource:[inst_norm resultImage]];
+    // TODO: Change to Image Size;
+    int gram_scaling_1 = (256 * 256);
+    int gram_scaling_2 = ((256/2) * (256/2));
+    int gram_scaling_3 = ((256/4) * (256/4));
+    int gram_scaling_4 = ((256/8) * (256/8));
 
-    m_output = [sigmoid resultImage];
+    MPSNNGramMatrixCalculationNode *gram_matrix_style_loss_first_relu
+      = [MPSNNGramMatrixCalculationNode nodeWithSource:[style_vgg_loss firstRELU]
+                                                 alpha:(1.0/gram_scaling_1)];
+
+    MPSNNGramMatrixCalculationNode *gram_matrix_content_vgg_first_relu
+      = [MPSNNGramMatrixCalculationNode nodeWithSource:[content_vgg firstRELU]
+                                                 alpha:(1.0/gram_scaling_1)];
+
+    MPSNNForwardLossNode *style_loss_node_1 = [MPSNNForwardLossNode nodeWithSource:[gram_matrix_content_vgg_first_relu resultImage]
+                                                                            labels:[gram_matrix_style_loss_first_relu resultImage]
+                                                                    lossDescriptor:style_desc];
+
+
+
+    MPSNNGramMatrixCalculationNode *gram_matrix_style_loss_second_relu
+      = [MPSNNGramMatrixCalculationNode nodeWithSource:[style_vgg_loss secondRELU]
+                                                 alpha:(1.0/gram_scaling_2)];
+
+    MPSNNGramMatrixCalculationNode *gram_matrix_content_vgg_second_relu
+      = [MPSNNGramMatrixCalculationNode nodeWithSource:[content_vgg secondRELU]
+                                                 alpha:(1.0/gram_scaling_2)];
+
+    MPSNNForwardLossNode *style_loss_node_2 = [MPSNNForwardLossNode nodeWithSource:[gram_matrix_content_vgg_second_relu resultImage]
+                                                                            labels:[gram_matrix_style_loss_second_relu resultImage]
+                                                                    lossDescriptor:style_desc];
+
+
+
+    MPSNNGramMatrixCalculationNode *gram_matrix_style_loss_third_relu
+      = [MPSNNGramMatrixCalculationNode nodeWithSource:[style_vgg_loss thirdRELU]
+                                                 alpha:(1.0/gram_scaling_3)];
+
+    MPSNNGramMatrixCalculationNode *gram_matrix_content_vgg_third_relu
+      = [MPSNNGramMatrixCalculationNode nodeWithSource:[content_vgg thirdRELU]
+                                                 alpha:(1.0/gram_scaling_3)];
+
+    MPSNNForwardLossNode *style_loss_node_3 = [MPSNNForwardLossNode nodeWithSource:[gram_matrix_content_vgg_third_relu resultImage]
+                                                                            labels:[gram_matrix_style_loss_third_relu resultImage]
+                                                                    lossDescriptor:style_desc];
+
+
+
+    MPSNNGramMatrixCalculationNode *gram_matrix_style_loss_fourth_relu
+      = [MPSNNGramMatrixCalculationNode nodeWithSource:[style_vgg_loss fourthRELU]
+                                                 alpha:(1.0/gram_scaling_4)];
+
+    MPSNNGramMatrixCalculationNode *gram_matrix_content_vgg_fourth_relu
+      = [MPSNNGramMatrixCalculationNode nodeWithSource:[content_vgg fourthRELU]
+                                                 alpha:(1.0/gram_scaling_4)];
+
+    MPSNNForwardLossNode *style_loss_node_4 = [MPSNNForwardLossNode nodeWithSource:[gram_matrix_content_vgg_fourth_relu resultImage]
+                                                                            labels:[gram_matrix_style_loss_fourth_relu resultImage]
+                                                                    lossDescriptor:style_desc];
+
+
+
+    MPSNNForwardLossNode *content_loss_node = [MPSNNForwardLossNode nodeWithSource:[content_vgg thirdRELU]
+                                                                            labels:[content_vgg_loss thirdRELU]
+                                                                    lossDescriptor:content_desc];
+
+
+    MPSNNAdditionNode* add_loss_1_1 = [MPSNNAdditionNode nodeWithSources:@[[style_loss_node_1 resultImage],
+                                                                           [style_loss_node_2 resultImage]]];
+
+    MPSNNAdditionNode* add_loss_1_2 = [MPSNNAdditionNode nodeWithSources:@[[style_loss_node_3 resultImage],
+                                                                           [style_loss_node_4 resultImage]]];
+
+    MPSNNAdditionNode* add_loss_1 = [MPSNNAdditionNode nodeWithSources:@[[add_loss_1_1 resultImage],
+                                                                         [add_loss_1_2 resultImage]]];
+
+    MPSNNAdditionNode* total_loss = [MPSNNAdditionNode nodeWithSources:@[[add_loss_1 resultImage],
+                                                                         [content_loss_node resultImage]]];
+
+    MPSNNInitialGradientNode *initial_gradient = [MPSNNInitialGradientNode nodeWithSource:[total_loss resultImage]];
+
+    BOOL resultsAreNeeded[] = { YES, YES };
+
+    NSArray<MPSNNFilterNode*>* lastNodes = [initial_gradient trainingGraphWithSourceGradient:[initial_gradient resultImage]
+                                                                                 nodeHandler: nil];
+
+    training_graph = [MPSNNGraph graphWithDevice: [cmd_q device]
+                                    resultImages: @[lastNodes[0].resultImage, lastNodes[1].resultImage]
+                                resultsAreNeeded: &resultsAreNeeded[0]];
+
+    inference_graph = [MPSNNGraph graphWithDevice: [cmd_q device]
+                                      resultImage: [model forwardPass]
+                              resultImageIsNeeded:YES];
+
+    training_graph.format = MPSImageFeatureChannelFormatFloat32;
+    inference_graph.format = MPSImageFeatureChannelFormatFloat32;
 
     return self;
   }
 }
 
-- (MPSNNImageNode * _Nullable) forwardPass {
-  return m_output;
-}
 
-- (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull)inputNode {
-  MPSNNGradientFilterNode* sigmoid_grad = [sigmoid gradientFilterWithSource: inputNode];
-  MPSNNGradientFilterNode* instance_norm_grad = [inst_norm gradientFilterWithSource: [sigmoid_grad resultImage]];
-  MPSNNGradientFilterNode* conv_grad = [conv gradientFilterWithSource: [instance_norm_grad resultImage]];
-
-  MPSNNImageNode* decoding_2_img = [decoding_2 backwardPass:[conv_grad resultImage]];
-  MPSNNImageNode* decoding_1_img = [decoding_1 backwardPass:decoding_2_img];
-
-  MPSNNImageNode* residual_5_img = [residual_5 backwardPass:decoding_1_img];
-  MPSNNImageNode* residual_4_img = [residual_4 backwardPass:residual_5_img];
-  MPSNNImageNode* residual_3_img = [residual_3 backwardPass:residual_4_img];
-  MPSNNImageNode* residual_2_img = [residual_2 backwardPass:residual_3_img];
-  MPSNNImageNode* residual_1_img = [residual_1 backwardPass:residual_2_img];
-
-  MPSNNImageNode* encoding_3_grad = [encoding_3 backwardPass:residual_1_img];
-  MPSNNImageNode* encoding_2_grad = [encoding_2 backwardPass:encoding_3_grad];
-  MPSNNImageNode* encoding_1_grad = [encoding_1 backwardPass:encoding_2_grad];
-  
-  return encoding_1_grad;
+- (MPSImage * _Nullable) forward:(MPSImage * _Nonnull)image {
+  return Nil;
 }
 
 @end

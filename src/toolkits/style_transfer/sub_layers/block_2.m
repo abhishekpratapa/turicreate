@@ -82,6 +82,10 @@
   return m_output;
 }
 
+- (MPSNNImageNode * _Nullable) feature {
+  return m_feature;
+}
+
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull)inputNode {
   MPSNNGradientFilterNode* pooling_grad = [pooling gradientFilterWithSource: inputNode];
   MPSNNGradientFilterNode* relu_3_grad = [relu_3 gradientFilterWithSource: [pooling_grad resultImage]];

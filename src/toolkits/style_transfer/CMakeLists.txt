@@ -2,8 +2,9 @@ project(unity_toolkits)
 
 make_library(unity_style_transfer OBJECT
     SOURCES
+        style_transfer.m
         pre_processing.m
-     	style_transfer.m
+     	transformer.m
      	vgg_16.m
      	sub_layers/block_1.m
      	sub_layers/block_2.m

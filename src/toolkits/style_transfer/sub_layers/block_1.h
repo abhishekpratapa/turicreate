@@ -29,6 +29,7 @@ API_AVAILABLE(macos(10.14))
                        initWeights:(struct Block1Weights)weights;
 
 - (MPSNNImageNode * _Nullable) forwardPass;
+- (MPSNNImageNode * _Nullable) feature;
 - (MPSNNImageNode * _Nullable) backwardPass:(MPSNNImageNode * _Nonnull)inputNode;
 
 @end
