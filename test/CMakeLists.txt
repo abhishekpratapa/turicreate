@@ -10,6 +10,7 @@ subdirs(
         util
         serialization
         logger
+        ml
         timer
         random
         nanosockets
