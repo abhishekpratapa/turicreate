@@ -337,46 +337,11 @@ class ModuleVisibilityTests(unittest.TestCase):
         expected = ['NearestNeighborDeduplication', 'create']
         check_visible_modules(actual, expected)
 
-    def test_anomaly_detection(self):
-        actual = get_visible_items(turicreate.anomaly_detection)
-        expected = ['local_outlier_factor', 'moving_zscore', 'create', 'bayesian_changepoints']
-        check_visible_modules(actual, expected)
-
-        actual = get_visible_items(turicreate.toolkits.anomaly_detection)
-        expected = ['local_outlier_factor', 'moving_zscore', 'create', 'bayesian_changepoints']
-        check_visible_modules(actual, expected)
-
-        actual = get_visible_items(
-            turicreate.anomaly_detection.local_outlier_factor)
-        expected = ['LocalOutlierFactorModel', 'create']
-        check_visible_modules(actual, expected)
-
-        actual = get_visible_items(
-            turicreate.anomaly_detection.moving_zscore)
-        expected = ['MovingZScoreModel', 'create']
-        check_visible_modules(actual, expected)
-
-    def test_lead_scoring(self):
-        expected = ['LeadScoringModel', 'create']
-
-        actual = get_visible_items(turicreate.lead_scoring)
-        check_visible_modules(actual, expected)
-
-        actual = get_visible_items(turicreate.toolkits.lead_scoring)
-        check_visible_modules(actual, expected)
-
     def test_topic_model(self):
         actual = get_visible_items(turicreate.topic_model)
         expected = ['TopicModel',
                     'create',
                     'perplexity']
-        check_visible_modules(actual, expected)
-
-    def test_churn_predictor(self):
-        actual = get_visible_items(turicreate.churn_predictor)
-        expected = ['ChurnPredictor',
-                    'create',
-                    'random_split']
         check_visible_modules(actual, expected)
 
     def test_text_analytics(self):
@@ -417,40 +382,29 @@ class ModuleVisibilityTests(unittest.TestCase):
                     'random_forest_regression']
         check_visible_modules(actual, expected)
 
-    def test_cross_validation(self):
-        actual = get_visible_items(turicreate.cross_validation)
-        expected = ['cross_val_score',
-                    'shuffle',
-                    'KFold']
-        check_visible_modules(actual, expected)
-
     def test_toolkits(self):
         actual = get_visible_items(turicreate.toolkits)
-        expected = [
-                    'anomaly_detection',
-                    'churn_predictor',
+        expected = ['activity_classifier',
+                    'audio_analysis',
                     'classifier',
                     'clustering',
-                    'comparison',
-                    'cross_validation',
-                    'data_matching',
-                    'deeplearning',
                     'distances',
+                    'drawing_classifier',
                     'evaluation',
-                    'feature_engineering',
                     'graph_analytics',
                     'image_analysis',
-                    'lead_scoring',
-                    'model_parameter_search',
+                    'image_classifier',
+                    'image_similarity',
                     'nearest_neighbors',
-                    'pattern_mining',
-                    'product_sentiment',
+                    'object_detector',
+                    'one_shot_object_detector',
                     'recommender',
                     'regression',
-                    'sentiment_analysis',
+                    'sound_classifier',
+                    'style_transfer',
                     'text_analytics',
-                    'topic_model',
-                    ]
+                    'text_classifier',
+                    'topic_model']
         check_visible_modules(actual, expected)
 
     def test_graph_analytics(self):
