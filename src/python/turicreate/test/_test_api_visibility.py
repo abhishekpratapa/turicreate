@@ -85,95 +85,36 @@ class TabCompleteVisibilityTests(unittest.TestCase):
         m = turicreate.linear_regression.create(sf, target='d1')
 
         expected = ['coefficients',
-            'convergence_threshold',
-            'evaluate',
-            'export_coreml',
-            'feature_rescaling',
-            'features',
-            'get',
-            'l1_penalty',
-            'l2_penalty',
-            'lbfgs_memory_level',
-            '_list_fields',
-            '_list_fields',
-            'max_iterations',
-            'name',
-            'num_coefficients',
-            'num_examples',
-            'num_features',
-            'num_unpacked_features',
-            'predict',
-            'progress',
-            'save',
-            'show',
-            'solver',
-            'step_size',
-            'summary',
-            'target',
-            'training_iterations',
-            'training_loss',
-            'training_rmse',
-            'training_solver_status',
-            'training_time',
-            'unpacked_features']
-
-        actual = [x for x in dir(m) if not x.startswith('_')]
-        check_visible_modules(actual, expected)
-
-    def test_churn_predictor(self):
-        # Arrange
-        time = [1453845953 + 20000 * x for x in range(500)]
-        user = [1,2,3,4,5] * 20 + [1,2,3,4] * 25 + [1,2,3] * 100
-        actions = turicreate.SFrame({
-            'user_id': user,
-            'timestamp': time,
-            'action': [1,2,3,4,5] * 100,
-        })
-        def _unix_timestamp_to_datetime(x):
-            import datetime
-            return datetime.datetime.fromtimestamp(x)
-        actions['timestamp'] = actions['timestamp'].apply(
-                                  _unix_timestamp_to_datetime)
-        actions = turicreate.TimeSeries(actions, 'timestamp')
-
-        # Act
-        m = turicreate.churn_predictor.create(actions)
-        actual = [x for x in dir(m) if not x.startswith('_')]
-
-        # Assert.
-        expected = ['categorical_features',
+                    'convergence_threshold',
                     'evaluate',
-                    'extract_features',
-                    'get_feature_importance',
-                    'churn_period',
-                    'grace_period',
+                    'export_coreml',
+                    'feature_rescaling',
                     'features',
-                    'get',
-                    'is_data_aggregated',
-                    '_list_fields',
-                    '_list_fields',
-                    'lookback_periods',
-                    'model_options',
-                    'name',
+                    'l1_penalty',
+                    'l2_penalty',
+                    'lbfgs_memory_level',
+                    'max_iterations',
+                    'num_coefficients',
+                    'num_examples',
                     'num_features',
-                    'num_observations',
-                    'num_users',
-                    'numerical_features',
+                    'num_unpacked_features',
                     'predict',
-                    'explain',
-                    'processed_training_data',
+                    'progress',
                     'save',
-                    'show',
+                    'solver',
+                    'step_size',
                     'summary',
-                    'time_boundaries',
-                    'time_period',
-                    'trained_model',
-                    'trained_explanation_model',
-                    'get_churn_report',
-                    'get_activity_baseline',
-                    'views',
-                    'use_advanced_features',
-                    'user_id']
+                    'target',
+                    'training_iterations',
+                    'training_loss',
+                    'training_max_error',
+                    'training_rmse',
+                    'training_solver_status',
+                    'training_time',
+                    'unpacked_features',
+                    'validation_data']
+
+        actual = [x for x in dir(m) if not x.startswith('_')]
         check_visible_modules(actual, expected)
 
     def test_topic_model(self):
@@ -181,26 +122,22 @@ class TabCompleteVisibilityTests(unittest.TestCase):
         m = turicreate.topic_model.create(sa)
 
         expected = ['alpha',
-            'beta',
-            'evaluate',
-            'get',
-            'get_topics',
-            '_list_fields',
-            'name',
-            'num_burnin',
-            'num_iterations',
-            'num_topics',
-            'predict',
-            'print_interval',
-            'save',
-            'show',
-            'summary',
-            'topics',
-            'training_iterations',
-            'training_time',
-            'validation_time',
-            'verbose',
-            'vocabulary']
+                    'beta',
+                    'evaluate',
+                    'get_topics',
+                    'num_burnin',
+                    'num_iterations',
+                    'num_topics',
+                    'predict',
+                    'print_interval',
+                    'save',
+                    'summary',
+                    'topics',
+                    'training_iterations',
+                    'training_time',
+                    'validation_time',
+                    'verbose',
+                    'vocabulary']
 
         actual = [x for x in dir(m) if not x.startswith('_')]
         check_visible_modules(actual, expected)
@@ -283,7 +220,7 @@ class ModuleVisibilityTests(unittest.TestCase):
         other = ['util', 'create']
 
         # Check visibility in turicreate.recommender
-        actual = [x for x in dir(turicreate.recommender) if '__' not in x]
+        actual = get_visible_items(turicreate.recommender)
         expected = (recommenders + other)
         check_visible_modules(actual, expected)
 
@@ -306,8 +243,7 @@ class ModuleVisibilityTests(unittest.TestCase):
         assert set(actual) == set(expected + ['PopularityRecommender'])
 
         actual = get_visible_items(turicreate.recommender.util)
-        expected = ['random_split_by_user', 'RecommenderViews', \
-                    'precision_recall_by_user', 'compare_models']
+        expected = ['random_split_by_user', 'precision_recall_by_user', 'compare_models']
         check_visible_modules(actual, expected)
 
     def test_nearest_neighbors(self):
@@ -320,22 +256,6 @@ class ModuleVisibilityTests(unittest.TestCase):
         expected = ['kmeans', 'dbscan']
         check_visible_modules(actual, expected)
 
-    def test_data_matching(self):
-        actual = get_visible_items(turicreate.data_matching)
-        expected = DATA_MATCHING
-        check_visible_modules(actual, expected)
-
-        actual = get_visible_items(turicreate.autotagger)
-        expected = ['create']
-        check_visible_modules(actual, expected)
-
-        actual = get_visible_items(turicreate.deduplication)
-        expected = ['create']
-        check_visible_modules(actual, expected)
-
-        actual = get_visible_items(turicreate.nearest_neighbor_deduplication)
-        expected = ['NearestNeighborDeduplication', 'create']
-        check_visible_modules(actual, expected)
 
     def test_topic_model(self):
         actual = get_visible_items(turicreate.topic_model)
@@ -346,31 +266,27 @@ class ModuleVisibilityTests(unittest.TestCase):
 
     def test_text_analytics(self):
         actual = get_visible_items(turicreate.text_analytics)
-        expected = ['tf_idf',
-                    'bm25',
-                    'stopwords',
-                    'count_words',
+        expected = ['bm25',
                     'count_ngrams',
-                    'random_split',
-                    'parse_sparse',
+                    'count_words',
+                    'drop_words',
                     'parse_docword',
-                    'tokenize',
-                    'trim_rare_words',
-                    'split_by_sentence',
-                    'extract_parts_of_speech',
-                    'PartOfSpeech']
+                    'parse_sparse',
+                    'random_split',
+                    'stop_words',
+                    'tf_idf',
+                    'tokenize']
         check_visible_modules(actual, expected)
 
     def test_classifier(self):
         actual = get_visible_items(turicreate.classifier)
-        expected = ['create',
-                    'logistic_classifier',
-                    'boosted_trees_classifier',
-                    'random_forest_classifier',
+        expected = ['boosted_trees_classifier',
+                    'create',
                     'decision_tree_classifier',
-                    'neuralnet_classifier',
-                    'svm_classifier',
-                    'nearest_neighbor_classifier']
+                    'logistic_classifier',
+                    'nearest_neighbor_classifier',
+                    'random_forest_classifier',
+                    'svm_classifier']
         check_visible_modules(actual, expected)
 
     def test_regression(self):
@@ -470,31 +386,3 @@ class ModuleVisibilityTests(unittest.TestCase):
           actual = get_visible_items(module)
           expected = common_functions + funcs
           check_visible_modules(actual, expected)
-
-    def test_feature_engineering(self):
-        actual = get_visible_items(turicreate.toolkits.feature_engineering)
-        expected = ['AutoVectorizer',
-                    'BM25',
-                    'CategoricalImputer',
-                    'CountThresholder',
-                    'CountFeaturizer',
-                    'DeepFeatureExtractor',
-                    'FeatureBinner',
-                    'FeatureHasher',
-                    'NGramCounter',
-                    'NumericImputer',
-                    'OneHotEncoder',
-                    'QuadraticFeatures',
-                    'RandomProjection',
-                    'TFIDF',
-                    'Tokenizer',
-                    'TransformerBase',
-                    'TransformerChain',
-                    'TransformToFlatDictionary',
-                    'WordCounter',
-                    'RareWordTrimmer',
-                    'SentenceSplitter',
-                    'PartOfSpeechExtractor',
-                    'create']
-
-        check_visible_modules(actual, expected)
