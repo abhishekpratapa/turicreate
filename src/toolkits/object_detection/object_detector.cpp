@@ -28,6 +28,7 @@
 #include <toolkits/object_detection/od_yolo.hpp>
 #include <toolkits/supervised_learning/automatic_model_creation.hpp>
 #include <toolkits/util/training_utils.hpp>
+#include <ml/neural_net/mps_compute_context.hpp>
 
 #ifdef __APPLE__
 
@@ -193,6 +194,8 @@ image_augmenter::options get_augmentation_options(flex_int batch_size,
   opts.saturation_max_jitter = 0.05f;
   opts.hue_max_jitter = 0.05f;
 
+  opts.random_seed = 2017;
+
   return opts;
 }
 
@@ -209,6 +212,12 @@ flex_int estimate_max_iterations(flex_int num_instances, flex_int batch_size) {
 
   // Always return a positive number.
   return std::max(1000, static_cast<int>(num_iter_rounded));
+}
+
+void save_image_augumenter(image_augmenter::result& im) {
+  auto image_batch = im.image_batch;
+  // std::cout << image_batch.size() << std::endl;
+  // std::cout << image_batch.size() << std::endl;
 }
 
 }  // namespace
@@ -730,8 +739,10 @@ void object_detector::perform_predict(
   augmenter_opts.batch_size = batch_size;
   augmenter_opts.output_height = grid_height * SPATIAL_REDUCTION;
   augmenter_opts.output_width = grid_width * SPATIAL_REDUCTION;
+
+  auto augmenter_context = neural_net::mps_compute_context::create();
   std::unique_ptr<image_augmenter> augmenter =
-      ctx->create_image_augmenter(augmenter_opts);
+      augmenter_context->create_image_augmenter(augmenter_opts);
 
   // Instantiate the NN backend.
   // For each anchor box, we have 4 bbox coords + 1 conf + one-hot class labels
@@ -865,7 +876,7 @@ std::unique_ptr<model_spec> object_detector::init_model(
   }
 
   // Initialize a random number generator for weight initialization.
-  std::seed_seq seed_seq = { read_state<int>("random_seed") };
+  std::seed_seq seed_seq = { 2017 };
   std::mt19937 random_engine(seed_seq);
 
   // Append conv7, initialized using the Xavier method (with base magnitude 3).
@@ -1105,7 +1116,8 @@ void object_detector::init_training(gl_sframe data,
   // Choose a random seed if not set.
   if (read_state<flexible_type>("random_seed") == FLEX_UNDEFINED) {
     std::random_device random_device;
-    int random_seed = static_cast<int>(random_device());
+    // int random_seed = static_cast<int>(random_device());
+    int random_seed = static_cast<int>(1997);
     add_or_update_state({{"random_seed", random_seed}});
   }
 
@@ -1193,9 +1205,15 @@ void object_detector::init_training_backend() {
   // Instantiate the data augmenter.
   flex_int grid_height = read_state<flex_int>("grid_height");
   flex_int grid_width = read_state<flex_int>("grid_width");
-  training_data_augmenter_ = training_compute_context_->create_image_augmenter(
+
+  auto augmenter_context = neural_net::mps_compute_context::create();
+  training_data_augmenter_ = augmenter_context->create_image_augmenter(
       get_augmentation_options(read_state<flex_int>("batch_size"), grid_height,
                                grid_width));
+
+  // training_data_augmenter_ = training_compute_context_->create_image_augmenter(
+  //     get_augmentation_options(read_state<flex_int>("batch_size"), grid_height,
+  //                              grid_width));
 
   // Instantiate the NN backend.
   int num_outputs_per_anchor =  // 4 bbox coords + 1 conf + one-hot class labels
@@ -1270,6 +1288,9 @@ void object_detector::iterate_training() {
   // Perform data augmentation.
   image_augmenter::result augmenter_result =
       training_data_augmenter_->prepare_images(std::move(image_batch));
+
+  save_image_augumenter(augmenter_result);
+  // batch_size augmenter_result.image_batch
 
   // Encode the labels.
   shared_float_array label_batch =

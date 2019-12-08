@@ -201,7 +201,9 @@ class tf_image_augmenter : public float_array_image_augmenter {
       labeled_float_image data_to_augment) override;
 };
 
-tf_image_augmenter::tf_image_augmenter(const options& opts) : float_array_image_augmenter(opts) {}
+tf_image_augmenter::tf_image_augmenter(const options& opts) : float_array_image_augmenter(opts) {
+  std::cout << "Creating TF Image Augmenter" << std::endl;
+}
 
 float_array_image_augmenter::float_array_result
 tf_image_augmenter::prepare_augmented_images(

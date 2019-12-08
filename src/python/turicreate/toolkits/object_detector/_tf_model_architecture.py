@@ -404,6 +404,8 @@ class ODTensorFlowModel(TensorFlowModel):
             feed_dict[key] = _utils.convert_shared_float_array_to_numpy(feed_dict[key])
         feed_dict['labels'] = feed_dict['labels'].reshape(self.batch_size, self.grid_shape[0], self.grid_shape[1],self.num_anchors, self.num_classes + 5)
 
+        # print(feed_dict['input'])
+
         _, loss_batch = self.sess.run([self.train_op, self.loss], feed_dict={self.images: feed_dict['input'],
                                                                              self.labels: feed_dict['labels'],
                                                                              self.is_train: True})

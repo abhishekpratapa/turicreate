@@ -263,6 +263,7 @@ def _assert(cond, ex_type, msg):
             return []
 
 def get_augmented_images(images, output_shape):
+    print("Get Augmented Images")
 
     # Store transformations and augmented_images for the input batch
     transformations = []

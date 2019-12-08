@@ -109,7 +109,6 @@ std::vector<std::string> mps_compute_context::gpu_names() const {
 
 std::unique_ptr<image_augmenter> mps_compute_context::create_image_augmenter(
     const image_augmenter::options& opts) {
-
   return std::unique_ptr<image_augmenter>(new mps_image_augmenter(opts));
 }
 
