@@ -30,6 +30,9 @@
 #include <toolkits/util/training_utils.hpp>
 #include <ml/neural_net/mps_compute_context.hpp>
 
+
+#include <core/data/image/image_type.hpp>
+
 #ifdef __APPLE__
 
 #include <os/log.h>
@@ -214,8 +217,67 @@ flex_int estimate_max_iterations(flex_int num_instances, flex_int batch_size) {
   return std::max(1000, static_cast<int>(num_iter_rounded));
 }
 
+float clamp(float v, float low, float high) {
+  return (v < low) ? low : (high < v) ? high : v;
+}
+
 void save_image_augumenter(image_augmenter::result& im) {
   auto image_batch = im.image_batch;
+  auto annotations_batch = im.annotations_batch;
+  
+  constexpr size_t image_size = 416 * 416 * 3;
+  std::vector<std::vector<uint8_t>> images(32);
+  for (size_t x = 0; x < images.size(); x++) {
+    images[x] = std::vector<uint8_t>(image_size);
+  }
+
+  gl_sframe_writer result({"stylized_image", "annotations"}, {flex_type_enum::IMAGE, flex_type_enum::LIST}, 1);
+
+  const float* data_begin = image_batch.data();
+
+  for (size_t index = 0; index < 32; index++) {
+    size_t index_offset = image_size * index;
+    std::transform(data_begin + index_offset, data_begin + index_offset + image_size, images[index].begin(),
+                 [](float val) {
+                     return static_cast<uint8_t>(
+                         clamp(std::round(val * 255.f), 0.f, 255.f));
+                   });
+
+    image_type img(reinterpret_cast<char*>(images[index].data()), 416, 416,
+                   3, images[index].size(), IMAGE_TYPE_CURRENT_VERSION,
+                   static_cast<int>(Format::RAW_ARRAY));
+
+
+
+    std::vector<flexible_type> coordinate_list;
+
+
+    for (size_t j=0; j < annotations_batch[index].size(); j++) {
+      auto annotation = annotations_batch[index][j];
+
+      flex_dict coordinates_vec = {
+        {"height", static_cast<int>(annotation.bounding_box.height * 416)},
+        {"width", static_cast<int>(annotation.bounding_box.width * 416)},
+        {"x", static_cast<int>(annotation.bounding_box.x * 416 + (annotation.bounding_box.width * 416 / 2))},
+        {"y", static_cast<int>(annotation.bounding_box.y * 416 + (annotation.bounding_box.height * 416 / 2))}
+      }; 
+
+      flex_dict annotations_val = {
+        {"coordinates", coordinates_vec},
+        {"label", "ball"}
+      };
+
+      coordinate_list.push_back(annotations_val);
+      // int identifier = 0;
+      // image_box bounding_box;
+      // float confidence = 0.f;  // Typically 1 for training data
+    }
+    
+    result.write({img, coordinate_list}, 0);
+  }
+
+  auto result_sf = result.close();
+  result_sf.save("./augmented.sframe");
   // std::cout << image_batch.size() << std::endl;
   // std::cout << image_batch.size() << std::endl;
 }

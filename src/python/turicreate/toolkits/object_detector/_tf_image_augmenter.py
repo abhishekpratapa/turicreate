@@ -20,6 +20,8 @@ from tensorflow.python.ops import logging_ops
 from tensorflow.python.ops import variables
 import turicreate.toolkits._tf_utils as _utils
 
+from PIL import Image
+
 tf.disable_v2_behavior()
 
 def get_augmented_data(images, annotations, output_height, output_width, resize_only):
@@ -38,10 +40,40 @@ def get_augmented_data(images, annotations, output_height, output_width, resize_
                 resized_images = np.array(resized_images, dtype=np.float32)
                 return tuple((resized_images, len(resized_images)*[np.zeros(6)]))
             else:
-                imgs, transformations = get_augmented_images(images, output_shape)
-                augmented_images, trans = session.run([imgs, transformations])
+                imgs, transformations, slice_offset_arr, scale_h_arr, scale_w_arr, new_h_arr, new_w_arr, pad_offset_arr, pad_image_arr, scaled_image, augmented_image_arr = get_augmented_images(images, output_shape)
+                augmented_images, trans, slice_offset, scale_h, scale_w, n_h, n_w, pad_offset, pad_image, s_i, augmented_image = session.run([imgs, transformations, slice_offset_arr, scale_h_arr, scale_w_arr, new_h_arr, new_w_arr, pad_offset_arr, pad_image_arr, scaled_image, augmented_image_arr])
                 augmented_annotations = apply_bounding_box_transformation(images, annotations, trans, output_shape)
                 augmented_images = np.array(augmented_images, dtype=np.float32)
+                print("scale_h")
+                print(scale_h)
+                print("scale_w")
+                print(scale_w)
+                print("new_height")
+                print(n_h)
+                print("new_width")
+                print(n_w)
+                print("New Shape")
+                i = 0
+                for s in s_i:
+                    im = Image.fromarray(np.uint8(s * 255))
+                    im.save("scaled_"+str(i)+".png")
+                    i += 1
+                print("Pad Offset")
+                print(pad_offset)
+                print("Pad Images")
+                i = 0
+                for p in pad_image:
+                    im = Image.fromarray(np.uint8(p * 255))
+                    im.save("padded_"+str(i)+".png")
+                    i += 1
+                print("Augumented Images")
+                i = 0
+                for a in augmented_image:
+                    im = Image.fromarray(np.uint8(a * 255))
+                    im.save("augmented_"+str(i)+".png")
+                    i += 1
+                print("Slicing")
+                print(slice_offset)
                 return tuple((augmented_images, augmented_annotations))
 
 def is_tensor(x):
@@ -199,7 +231,6 @@ def pad_to_bounding_box(image, offset_height, offset_width, target_height,
     return padded
 
 def apply_bounding_box_transformation(images, annotations, transformations, clip_to_shape=None):
-
   aug_anns = []
   for i in range(len(annotations)):
       image = _utils.convert_shared_float_array_to_numpy(images[i])
@@ -224,6 +255,8 @@ def apply_bounding_box_transformation(images, annotations, transformations, clip
       # Reverse shape
       bbox_out = v[:, :2].reshape(-1, 4)
       
+      drop_indicies = []
+
       # Make points correctly ordered (lower < upper)
       # Can probably be made much nicer (numpy-ified?)
       for i in range(len(bbox_out)):
@@ -232,11 +265,27 @@ def apply_bounding_box_transformation(images, annotations, transformations, clip
           if bbox_out[i][1] > bbox_out[i][3]:
               bbox_out[i][1], bbox_out[i][3] = bbox_out[i][3], bbox_out[i][1]
 
+          bb_height = bbox_out[i][2] - bbox_out[i][0]
+          bb_width = bbox_out[i][3] - bbox_out[i][1]
+          bb_area = bb_height * bb_width
+
           if clip_to_shape is not None:
               bbox_out[:, 0::2] = np.clip(bbox_out[:, 0::2], 0, clip_to_shape[0])
               bbox_out[:, 1::2] = np.clip(bbox_out[:, 1::2], 0, clip_to_shape[1])
 
+          clip_height = bbox_out[i][2] - bbox_out[i][0]
+          clip_width = bbox_out[i][3] - bbox_out[i][1]
+          clip_area = clip_height * clip_width
+
+          if (clip_area/bb_area) < 0.5:
+              drop_indicies.append(i)
+      
+      bbox_out = np.delete(bbox_out, drop_indicies, 0)
+      identifier = np.delete(identifier, drop_indicies, 0)
+      confidence = np.delete(confidence, drop_indicies, 0)
+
       bbox = np.zeros(bbox_out.shape)
+      
       for k in range(len(bbox_out)):
           bbox[k][0] = bbox_out[k][1]/float(clip_to_shape[0])
           bbox[k][1] = bbox_out[k][0]/float(clip_to_shape[1])
@@ -279,27 +328,62 @@ def get_augmented_images(images, output_shape):
     max_contrast=1.25 
     horizontal_flip=True 
 
+    slice_offset_arr = []
+    scale_h_arr = []
+    scale_w_arr = []
+
+    scaled_image = []
+
+    new_h_arr = []
+    new_w_arr = []
+
+    pad_offset_arr = []
+    pad_image_arr = []
+
+    augmented_image_arr = []
+
     for i in range(len(images)):
 
         image = images[i]
         image = _utils.convert_shared_float_array_to_numpy(image)
+
+        print("315")
+        print(image.shape)
         
         height, width, _ = tf.unstack(tf.shape(image))
+
+        # scaling the image
         scale_h = tf.random_uniform([], minval=min_scale, maxval=max_scale)
         scale_w = scale_h * tf.exp(tf.random_uniform([], minval=-np.log(max_aspect_ratio), maxval=np.log(max_aspect_ratio)))
+        
+        scale_h_arr.append(scale_h)
+        scale_w_arr.append(scale_w)
+
         new_height = tf.to_int32(tf.to_float(height) * scale_h)
         new_width = tf.to_int32(tf.to_float(width) * scale_w)
 
+        new_h_arr.append(new_height)
+        new_w_arr.append(new_width)
+
         image_scaled = tf.squeeze(tf.image.resize_bilinear(tf.expand_dims(image, 0), [new_height, new_width]), [0])
+        scaled_image.append(tf.clip_by_value(image_scaled, 0, 1))
+
         # Image padding
         pad_image, pad_offset = pad_to_ensure_size(image_scaled, output_shape[0], output_shape[1])
+
+        pad_image_arr.append(tf.clip_by_value(pad_image, 0, 1))
+        pad_offset_arr.append(pad_offset)
 
         new_height = tf.maximum(output_shape[0], new_height)
         new_width = tf.maximum(output_shape[1], new_width)
 
         slice_offset = (tf.random_uniform([], minval=0, maxval=new_height - output_shape[0] + 1, dtype=tf.int32),
                         tf.random_uniform([], minval=0, maxval=new_width - output_shape[1] + 1, dtype=tf.int32))
+
+        slice_offset_arr.append(slice_offset)
+
         augmented_image = array_ops.slice(pad_image, [slice_offset[0], slice_offset[1], 0], [output_shape[0], output_shape[1], 3])
+        augmented_image_arr.append(tf.clip_by_value(augmented_image, 0, 1))
 
         if horizontal_flip:
             uniform_random = random_ops.random_uniform([], 0, 1.0)
@@ -317,7 +401,7 @@ def get_augmented_images(images, output_shape):
 
         # Make the transformation matrix
         transformation = tf.reshape(tf.stack([
-            scale_h, 0.0,                  ty,
+            scale_h, 0.0,                   ty,
             0.0,     flip_sign * scale_w,   tx,
             0.0,     0.0,                 1.0]
             ), (3, 3))
@@ -340,7 +424,7 @@ def get_augmented_images(images, output_shape):
         augmented_images.append(augmented_image)
         transformations.append(transformation)
         
-    return augmented_images, transformations
+    return augmented_images, transformations, slice_offset_arr, scale_h_arr, scale_w_arr, new_h_arr, new_w_arr, pad_offset_arr, pad_image_arr, scaled_image, augmented_image_arr
 
 def get_resized_images(images, output_shape):
     
