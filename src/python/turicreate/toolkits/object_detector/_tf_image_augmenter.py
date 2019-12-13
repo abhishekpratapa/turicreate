@@ -121,7 +121,6 @@ def padding_augmenter(image,
 
     for i in range(max_attempts):
         aspect_ratio = np.random.uniform(min_aspect_ratio, max_aspect_ratio)
-        print(aspect_ratio)
         min_height = float(image_height)
         
         min_height_from_width = float(image_width) / aspect_ratio
@@ -326,9 +325,9 @@ def crop_augmenter(image,
 def complete_augmenter(img_tf, ann_tf, output_height, output_width):
     # img_tf, ann_tf = tf.numpy_function(func=crop_augmenter, inp=[img_tf, ann_tf], Tout=[tf.float32, tf.float32])
     # img_tf, ann_tf = tf.numpy_function(func=padding_augmenter, inp=[img_tf, ann_tf], Tout=[tf.float32, tf.float32])
-    # img_tf, ann_tf = tf.numpy_function(func=horizontal_flip_augmenter, inp=[img_tf, ann_tf], Tout=[tf.float32, tf.float32])
-    # img_tf, ann_tf = color_augmenter(img_tf, ann_tf)
-    # img_tf, ann_tf = hue_augmenter(img_tf, ann_tf)
+    img_tf, ann_tf = tf.numpy_function(func=horizontal_flip_augmenter, inp=[img_tf, ann_tf], Tout=[tf.float32, tf.float32])
+    img_tf, ann_tf = color_augmenter(img_tf, ann_tf)
+    img_tf, ann_tf = hue_augmenter(img_tf, ann_tf)
     img_tf, ann_tf = resize_augmenter(img_tf, ann_tf, (output_height, output_width))
     return img_tf, ann_tf
 

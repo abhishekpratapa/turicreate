@@ -61,7 +61,8 @@ class ODTensorFlowModel(TensorFlowModel):
         self.init_steps = [self.num_iterations // 2, 3 * self.num_iterations // 4, self.num_iterations]
         self.lrs = [_np.float32(self.base_lr * 10 ** (-i)) for i, step in enumerate(self.init_steps)]
         self.steps_tf = self.init_steps[:-1]
-        self.lr = _tf.train.piecewise_constant(self.global_step, self.steps_tf, self.lrs)
+        
+        self.lr = self.base_lr
         # TODO: Evaluate method to update lr in set_learning_rate()
 
         self.opt = _tf.train.MomentumOptimizer(self.lr, momentum=0.9)

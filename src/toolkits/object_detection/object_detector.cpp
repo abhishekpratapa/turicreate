@@ -1254,21 +1254,21 @@ void object_detector::iterate_training() {
   // Update iteration count and check learning rate schedule.
   // TODO: Abstract out the learning rate schedule.
   flex_int iteration_idx = get_training_iterations();
-  flex_int max_iterations = get_max_iterations();
+  // flex_int max_iterations = get_max_iterations();
 
-  if (iteration_idx == max_iterations / 2) {
+  // if (iteration_idx == max_iterations / 2) {
+  
+  // training_model_->set_learning_rate(BASE_LEARNING_RATE / 10.f);
 
-    training_model_->set_learning_rate(BASE_LEARNING_RATE / 10.f);
+  // } else if (iteration_idx == max_iterations * 3 / 4) {
 
-  } else if (iteration_idx == max_iterations * 3 / 4) {
+  //   training_model_->set_learning_rate(BASE_LEARNING_RATE / 100.f);
 
-    training_model_->set_learning_rate(BASE_LEARNING_RATE / 100.f);
+  // } else if (iteration_idx == max_iterations) {
 
-  } else if (iteration_idx == max_iterations) {
-
-    // Handle any manually triggered iterations after the last planned one.
-    training_model_->set_learning_rate(BASE_LEARNING_RATE / 1000.f);
-  }
+  //   // Handle any manually triggered iterations after the last planned one.
+  //   training_model_->set_learning_rate(BASE_LEARNING_RATE / 1000.f);
+  // }
 
   // Update the model fields tracking how much training we've done.
   flex_int batch_size = read_state<flex_int>("batch_size");

@@ -258,71 +258,71 @@ mps_image_augmenter::mps_image_augmenter(
   NSMutableArray<id <TCMPSImageAugmenting>> *augmentations =
       [[NSMutableArray alloc] init];
 
-  // if (opts.crop_prob > 0.f) {
+  if (opts.crop_prob > 0.f) {
 
-  //   // Enable random crops.
-  //   TCMPSRandomCropAugmenter *cropAug = [[TCMPSRandomCropAugmenter alloc] init];
-  //   cropAug.skipProbability = 1.f - opts.crop_prob;
-  //   cropAug.minAspectRatio = opts.crop_opts.min_aspect_ratio;
-  //   cropAug.maxAspectRatio = opts.crop_opts.max_aspect_ratio;
-  //   cropAug.minAreaFraction = opts.crop_opts.min_area_fraction;
-  //   cropAug.maxAreaFraction = opts.crop_opts.max_area_fraction;
-  //   cropAug.minObjectCovered = opts.crop_opts.min_object_covered;
-  //   cropAug.maxAttempts = opts.crop_opts.max_attempts;
-  //   cropAug.minEjectCoverage = opts.crop_opts.min_eject_coverage;
+    // Enable random crops.
+    TCMPSRandomCropAugmenter *cropAug = [[TCMPSRandomCropAugmenter alloc] init];
+    cropAug.skipProbability = 1.f - opts.crop_prob;
+    cropAug.minAspectRatio = opts.crop_opts.min_aspect_ratio;
+    cropAug.maxAspectRatio = opts.crop_opts.max_aspect_ratio;
+    cropAug.minAreaFraction = opts.crop_opts.min_area_fraction;
+    cropAug.maxAreaFraction = opts.crop_opts.max_area_fraction;
+    cropAug.minObjectCovered = opts.crop_opts.min_object_covered;
+    cropAug.maxAttempts = opts.crop_opts.max_attempts;
+    cropAug.minEjectCoverage = opts.crop_opts.min_eject_coverage;
 
-  //   [augmentations addObject:cropAug];
-  // }
+    [augmentations addObject:cropAug];
+  }
 
-  // if (opts.pad_prob > 0.f) {
+  if (opts.pad_prob > 0.f) {
 
-  //   // Enable random padding.
-  //   TCMPSRandomPadAugmenter *padAug = [[TCMPSRandomPadAugmenter alloc] init];
-  //   padAug.skipProbability = 1.f - opts.pad_prob;
-  //   padAug.minAspectRatio = opts.pad_opts.min_aspect_ratio;
-  //   padAug.maxAspectRatio = opts.pad_opts.max_aspect_ratio;
-  //   padAug.minAreaFraction = opts.pad_opts.min_area_fraction;
-  //   padAug.maxAreaFraction = opts.pad_opts.max_area_fraction;
-  //   padAug.maxAttempts = opts.pad_opts.max_attempts;
+    // Enable random padding.
+    TCMPSRandomPadAugmenter *padAug = [[TCMPSRandomPadAugmenter alloc] init];
+    padAug.skipProbability = 1.f - opts.pad_prob;
+    padAug.minAspectRatio = opts.pad_opts.min_aspect_ratio;
+    padAug.maxAspectRatio = opts.pad_opts.max_aspect_ratio;
+    padAug.minAreaFraction = opts.pad_opts.min_area_fraction;
+    padAug.maxAreaFraction = opts.pad_opts.max_area_fraction;
+    padAug.maxAttempts = opts.pad_opts.max_attempts;
 
-  //   [augmentations addObject:padAug];
-  // }
+    [augmentations addObject:padAug];
+  }
 
-  // if (opts.horizontal_flip_prob > 0.f) {
+  if (opts.horizontal_flip_prob > 0.f) {
 
-  //   // Enable mirror images.
-  //   TCMPSHorizontalFlipAugmenter *horizontalFlipAug =
-  //       [[TCMPSHorizontalFlipAugmenter alloc] init];
-  //   horizontalFlipAug.skipProbability = 1.f - opts.horizontal_flip_prob;
-  //   [augmentations addObject:horizontalFlipAug];
-  // }
+    // Enable mirror images.
+    TCMPSHorizontalFlipAugmenter *horizontalFlipAug =
+        [[TCMPSHorizontalFlipAugmenter alloc] init];
+    horizontalFlipAug.skipProbability = 1.f - opts.horizontal_flip_prob;
+    [augmentations addObject:horizontalFlipAug];
+  }
 
-  // if (opts.brightness_max_jitter > 0.f ||
-  //     opts.contrast_max_jitter > 0.f ||
-  //     opts.saturation_max_jitter > 0.f) {
+  if (opts.brightness_max_jitter > 0.f ||
+      opts.contrast_max_jitter > 0.f ||
+      opts.saturation_max_jitter > 0.f) {
 
-  //   // Enable color controls.
-  //   TCMPSColorControlAugmenter *colorAug =
-  //       [[TCMPSColorControlAugmenter alloc] init];
-  //   colorAug.maxBrightnessDelta = opts.brightness_max_jitter;
-  //   colorAug.maxContrastProportion = opts.contrast_max_jitter;
-  //   colorAug.maxSaturationProportion = opts.saturation_max_jitter;
-  //   [augmentations addObject:colorAug];
-  // }
+    // Enable color controls.
+    TCMPSColorControlAugmenter *colorAug =
+        [[TCMPSColorControlAugmenter alloc] init];
+    colorAug.maxBrightnessDelta = opts.brightness_max_jitter;
+    colorAug.maxContrastProportion = opts.contrast_max_jitter;
+    colorAug.maxSaturationProportion = opts.saturation_max_jitter;
+    [augmentations addObject:colorAug];
+  }
 
-  // if (opts.hue_max_jitter > 0.f) {
+  if (opts.hue_max_jitter > 0.f) {
 
-  //   // Enable color rotation.
-  //   TCMPSHueAdjustAugmenter *hueAug = [[TCMPSHueAdjustAugmenter alloc] init];
-  //   hueAug.maxHueAdjust = opts.hue_max_jitter;
-  //   [augmentations addObject:hueAug];
-  // }
+    // Enable color rotation.
+    TCMPSHueAdjustAugmenter *hueAug = [[TCMPSHueAdjustAugmenter alloc] init];
+    hueAug.maxHueAdjust = opts.hue_max_jitter;
+    [augmentations addObject:hueAug];
+  }
 
-  // // Always resize to the fixed image size expected by the neural network.
-  // CGSize outputSize;
-  // outputSize.width = static_cast<CGFloat>(opts_.output_width);
-  // outputSize.height = static_cast<CGFloat>(opts_.output_height);
-  // [augmentations addObject:[[TCMPSResizeAugmenter alloc] initWithSize:outputSize]];
+  // Always resize to the fixed image size expected by the neural network.
+  CGSize outputSize;
+  outputSize.width = static_cast<CGFloat>(opts_.output_width);
+  outputSize.height = static_cast<CGFloat>(opts_.output_height);
+  [augmentations addObject:[[TCMPSResizeAugmenter alloc] initWithSize:outputSize]];
 
   augmentations_ = augmentations;
 
