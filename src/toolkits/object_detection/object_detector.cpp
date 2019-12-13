@@ -1050,6 +1050,10 @@ std::unique_ptr<data_iterator> object_detector::create_iterator(
   iterator_params.class_labels = std::move(class_labels);
   iterator_params.repeat = repeat;
 
+  iterator_params.shuffle = false;
+  iterator_params.random_seed = read_state<int>("random_seed");
+
+
   std::string annotation_origin = read_state<flex_string>("annotation_origin");
   std::string annotation_scale = read_state<flex_string>("annotation_scale");
   std::string annotation_position = read_state<flex_string>("annotation_position");
