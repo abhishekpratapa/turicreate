@@ -80,17 +80,17 @@ def resize_augmenter(image, annotation,
                      output_shape = _DEFAULT_AUG_PARAMS["output_shape"]):
     
 
-    new_height = tf.cast(output_shape[0], dtype=tf.int32)
-    new_width = tf.cast(output_shape[1], dtype=tf.int32)
+    # new_height = tf.cast(output_shape[0], dtype=tf.int32)
+    # new_width = tf.cast(output_shape[1], dtype=tf.int32)
 
-    # Determine the affine transform to apply and apply to the image itself.
-    image_scaled = tf.squeeze(tf.image.resize_bilinear(
-                          tf.expand_dims(image, 0), [new_height, new_width]), [0])
-    image_clipped = tf.clip_by_value(image_scaled, 0.0, 1.0)
-    annotation = tf.clip_by_value(annotation, 0.0, 1.0)
+    # # Determine the affine transform to apply and apply to the image itself.
+    # image_scaled = tf.squeeze(tf.image.resize_bilinear(
+    #                       tf.expand_dims(image, 0), [new_height, new_width]), [0])
+    # image_clipped = tf.clip_by_value(image_scaled, 0.0, 1.0)
+    # annotation = tf.clip_by_value(annotation, 0.0, 1.0)
 
     # No geometry changes (because of relative co-ordinate system)
-    return image_clipped, annotation
+    return image, annotation
 
 
 def horizontal_flip_augmenter(image, annotation, skip_probability=0.5):
@@ -121,6 +121,7 @@ def padding_augmenter(image,
 
     for i in range(max_attempts):
         aspect_ratio = np.random.uniform(min_aspect_ratio, max_aspect_ratio)
+        print(aspect_ratio)
         min_height = float(image_height)
         
         min_height_from_width = float(image_width) / aspect_ratio
@@ -325,9 +326,9 @@ def crop_augmenter(image,
 def complete_augmenter(img_tf, ann_tf, output_height, output_width):
     # img_tf, ann_tf = tf.numpy_function(func=crop_augmenter, inp=[img_tf, ann_tf], Tout=[tf.float32, tf.float32])
     # img_tf, ann_tf = tf.numpy_function(func=padding_augmenter, inp=[img_tf, ann_tf], Tout=[tf.float32, tf.float32])
-    img_tf, ann_tf = tf.numpy_function(func=horizontal_flip_augmenter, inp=[img_tf, ann_tf], Tout=[tf.float32, tf.float32])
-    img_tf, ann_tf = color_augmenter(img_tf, ann_tf)
-    img_tf, ann_tf = hue_augmenter(img_tf, ann_tf)
+    # img_tf, ann_tf = tf.numpy_function(func=horizontal_flip_augmenter, inp=[img_tf, ann_tf], Tout=[tf.float32, tf.float32])
+    # img_tf, ann_tf = color_augmenter(img_tf, ann_tf)
+    # img_tf, ann_tf = hue_augmenter(img_tf, ann_tf)
     img_tf, ann_tf = resize_augmenter(img_tf, ann_tf, (output_height, output_width))
     return img_tf, ann_tf
 
