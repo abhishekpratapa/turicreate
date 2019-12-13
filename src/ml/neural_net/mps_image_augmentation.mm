@@ -288,35 +288,35 @@ mps_image_augmenter::mps_image_augmenter(
   //   [augmentations addObject:padAug];
   // }
 
-  // if (opts.horizontal_flip_prob > 0.f) {
+  if (opts.horizontal_flip_prob > 0.f) {
 
-  //   // Enable mirror images.
-  //   TCMPSHorizontalFlipAugmenter *horizontalFlipAug =
-  //       [[TCMPSHorizontalFlipAugmenter alloc] init];
-  //   horizontalFlipAug.skipProbability = 1.f - opts.horizontal_flip_prob;
-  //   [augmentations addObject:horizontalFlipAug];
-  // }
+    // Enable mirror images.
+    TCMPSHorizontalFlipAugmenter *horizontalFlipAug =
+        [[TCMPSHorizontalFlipAugmenter alloc] init];
+    horizontalFlipAug.skipProbability = 1.f - opts.horizontal_flip_prob;
+    [augmentations addObject:horizontalFlipAug];
+  }
 
-  // if (opts.brightness_max_jitter > 0.f ||
-  //     opts.contrast_max_jitter > 0.f ||
-  //     opts.saturation_max_jitter > 0.f) {
+  if (opts.brightness_max_jitter > 0.f ||
+      opts.contrast_max_jitter > 0.f ||
+      opts.saturation_max_jitter > 0.f) {
 
-  //   // Enable color controls.
-  //   TCMPSColorControlAugmenter *colorAug =
-  //       [[TCMPSColorControlAugmenter alloc] init];
-  //   colorAug.maxBrightnessDelta = opts.brightness_max_jitter;
-  //   colorAug.maxContrastProportion = opts.contrast_max_jitter;
-  //   colorAug.maxSaturationProportion = opts.saturation_max_jitter;
-  //   [augmentations addObject:colorAug];
-  // }
+    // Enable color controls.
+    TCMPSColorControlAugmenter *colorAug =
+        [[TCMPSColorControlAugmenter alloc] init];
+    colorAug.maxBrightnessDelta = opts.brightness_max_jitter;
+    colorAug.maxContrastProportion = opts.contrast_max_jitter;
+    colorAug.maxSaturationProportion = opts.saturation_max_jitter;
+    [augmentations addObject:colorAug];
+  }
 
-  // if (opts.hue_max_jitter > 0.f) {
+  if (opts.hue_max_jitter > 0.f) {
 
-  //   // Enable color rotation.
-  //   TCMPSHueAdjustAugmenter *hueAug = [[TCMPSHueAdjustAugmenter alloc] init];
-  //   hueAug.maxHueAdjust = opts.hue_max_jitter;
-  //   [augmentations addObject:hueAug];
-  // }
+    // Enable color rotation.
+    TCMPSHueAdjustAugmenter *hueAug = [[TCMPSHueAdjustAugmenter alloc] init];
+    hueAug.maxHueAdjust = opts.hue_max_jitter;
+    [augmentations addObject:hueAug];
+  }
 
   // Always resize to the fixed image size expected by the neural network.
   CGSize outputSize;
