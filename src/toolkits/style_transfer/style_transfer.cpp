@@ -298,6 +298,10 @@ void style_transfer::init_options(
       FLEX_UNDEFINED, std::numeric_limits<int>::min(),
       std::numeric_limits<int>::max());
 
+  options.create_boolean_option(
+    "print_loss_breakdown",  "Print the content and style loss during training",
+    false, true);
+
   options.create_integer_option(
       "num_styles", "The number of styles present in the model", FLEX_UNDEFINED,
       1, std::numeric_limits<int>::max());
@@ -765,6 +769,8 @@ void style_transfer::iterate_training() {
 
   shared_float_array loss_batch = results.at("loss");
 
+  // TODO: print loss breakdown
+
   size_t loss_batch_size = loss_batch.size();
   float batch_loss = std::accumulate(
       loss_batch.data(), loss_batch.data() + loss_batch_size, 0.f,
@@ -780,6 +786,7 @@ void style_transfer::iterate_training() {
     loss_it->second = smoothed_loss;
   }
 
+  // TODO: add content and style to progress printer
   if (training_table_printer_) {
     training_table_printer_->print_progress_row(
         iteration_idx, iteration_idx + 1, batch_loss, progress_time());
